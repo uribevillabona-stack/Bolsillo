@@ -29,13 +29,27 @@ Run lint and typecheck before declaring any task done.
 - Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
 - Docs: https://docs.expo.dev/router/introduction.md
 
-## Building with EAS
+## Building (zero cost, local only)
 
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
+BOLSILLO has a hard zero-budget constraint: no cloud builds, no servers, no paid services.
+Build locally only: `npx expo run:android` (dev build) and `npx expo run:android --variant release`
+(signed APK), or `eas build --local`. Do NOT use cloud `eas build`, `eas submit` or `eas update`.
+Toolchain setup: `scripts/setup-android.ps1` (JDK 17 + Android SDK, no admin rights).
+
+## Project rules (BOLSILLO)
+
+- 100 % local-first: data lives in SQLite on the phone. Never add a backend, cloud DB or paid API.
+- Money is always an integer number of COP pesos. Format only via `src/lib/money.ts`.
+- UI is built only from `src/components` (design system). Colors only via theme tokens (`useTheme`).
+- Icons: Phosphor, imported per-icon in `src/components/icons.ts` (never the package barrel).
+- Reanimated shared values: use `.get()` / `.set()` (React Compiler is enabled).
+- Gesture Handler is v3: hooks API (`usePanGesture`, `GestureDetector`), `scheduleOnRN` from `react-native-worklets`.
+- Bottom tabs: `import { Tabs } from 'expo-router/js-tabs'` (the root export is deprecated).
+- Never read SMS (READ_SMS/RECEIVE_SMS are blocked in app.json). User-facing copy is Spanish (Colombia).
+- Run `npm run check` (typecheck + lint + tests) before declaring any task done.
 
 ## Rules
 
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
+- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:android` locally (never a cloud build).
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md

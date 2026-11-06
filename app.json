@@ -1,36 +1,47 @@
 {
   "expo": {
-    "name": "bolsillo",
+    "name": "BOLSILLO",
     "slug": "bolsillo",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bolsillo",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F3F0E8",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "co.edu.fet.bolsillo",
+      "supportsTablet": false
     },
     "android": {
+      "package": "co.edu.fet.bolsillo",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0E4D3A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": ["android.permission.READ_SMS", "android.permission.RECEIVE_SMS"]
     },
     "plugins": [
       "expo-router",
+      "expo-font",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#F3F0E8",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 76,
+          "dark": {
+            "backgroundColor": "#111210",
+            "image": "./assets/images/splash-icon.png"
+          }
+        }
+      ],
+      [
+        "./plugins/with-cmake-version",
+        {
+          "version": "3.31.6"
         }
       ]
     ],
