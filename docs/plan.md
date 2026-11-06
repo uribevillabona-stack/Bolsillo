@@ -1,0 +1,76 @@
+# Plan de BOLSILLO
+
+Documento vivo: aquí quedan las fases, el esquema de datos, los riesgos y las decisiones que
+se aprobaron. Se actualiza al cerrar cada fase.
+
+## Decisiones aprobadas
+
+| Fecha | Decisión |
+|---|---|
+| 2026-11-05 | Proyecto en `C:\dev\bolsillo` (fuera de OneDrive). Repo: `github.com/uribevillabona-stack/Bolsillo`. |
+| 2026-11-05 | Pestañas: Inicio · Movimientos · Aprende · Plan. Botón flotante de registro en todas. |
+| 2026-11-05 | `zod` para validar el JSON de respaldo al importarlo. |
+| 2026-11-05 | Rutas en `src/app/` (convención de Expo SDK 58) en lugar de `app/` en la raíz: todo el código queda bajo `src/`. |
+| 2026-11-05 | El onboarding se construye en la Fase 2, junto con la base de datos (necesita la tabla `profile`). |
+
+## Fases
+
+| Fase | Entregable | Estado |
+|---|---|---|
+| 1. Base | Expo SDK 58 + TS estricto, tema, design system, navegación, Jest/ESLint/Prettier, script de herramientas Android | Hecha |
+| 2. Gastos hormiga | Drizzle + migraciones, onboarding, registro rápido con persistencia y deshacer, vista Hormigas con proyección anual, atajos editables, exportar/importar JSON | Pendiente |
+| 3. Detección | Módulo Kotlin `NotificationListenerService` + cola nativa, parsers por banco con pruebas, deduplicación, bandeja de pendientes, aprendizaje comercio → categoría, intent de compartir, `docs/deteccion.md` | Pendiente |
+| 4. Plan e Inicio | Presupuesto por categoría con alerta al 80 %, Apartados, dashboard, motor de recomendaciones | Pendiente |
+| 5. Aprende | 5 lecciones en JSON + quiz, desbloqueo por comportamiento, racha semanal | Pendiente |
+| 6. Pulido | Modo oscuro completo, TalkBack, estados vacíos y de error, APK firmado con clave propia | Pendiente |
+
+## Pantallas
+
+```
+src/app/
+  _layout.tsx                 fuentes, tema, (Fase 2) migraciones y redirección a onboarding
+  (onboarding)/               perfil · meta · diagnóstico · consentimiento de detección
+  (tabs)/                     index (Inicio) · movimientos · aprende · plan
+  pendientes.tsx              bandeja de movimientos detectados
+  movimiento/[id].tsx · apartado/[id].tsx · leccion/[id].tsx
+  ajustes/                    atajos · detección · respaldo · categorías · inspector (dev)
+  catalogo.tsx                catálogo del design system (solo en desarrollo)
+```
+
+**Saldo disponible del mes** = ingresos del mes (registrados o detectados; si no hay, el
+estimado del onboarding) − egresos del mes − aportes a Apartados del mes.
+
+## Esquema de base de datos (Fase 2)
+
+Montos: `INTEGER` en pesos. Fechas: epoch en milisegundos.
+
+| Tabla | Campos clave |
+|---|---|
+| `profile` (1 fila) | `name`, `income_type`, `income_range`, `monthly_income_estimate`, `diagnostic` (json), `onboarding_done`, `detection_enabled`, `theme` |
+| `categories` | `id`, `name`, `icon`, `kind` (gasto/ingreso), `is_hormiga`, `archived` |
+| `transactions` | `id`, `type` (expense/income/transfer_in/transfer_out), `amount`, `category_id`, `note`, `merchant`, `bank`, `occurred_at`, `source` (manual/atajo/detectado/compartido), `created_at` |
+| `shortcuts` | `id`, `label`, `icon`, `amount`, `category_id`, `sort_order` |
+| `pending_movements` | `id`, `bank`, `package`, `raw_title`, `raw_text` (se borra al resolver), `parsed_type`, `amount`, `counterparty`, `occurred_at`, `dedup_hash`, `suggested_category_id`, `status`, `transaction_id` |
+| `merchant_rules` | `merchant_key` (PK), `category_id`, `hits`, `updated_at` |
+| `budgets` | `id`, `month` ('YYYY-MM'), `category_id`, `limit_amount` — único (`month`, `category_id`) |
+| `goals` (Apartados) | `id`, `name`, `target_amount`, `target_date`, `created_at`, `completed_at`, `archived` |
+| `goal_contributions` | `id`, `goal_id`, `amount` (negativo = retiro), `note`, `created_at` |
+| `lesson_progress` | `lesson_id` (PK), `status`, `started_at`, `completed_at`, `score` |
+| `recommendation_log` | `id`, `rule_id`, `shown_at`, `dismissed_at` |
+
+## Riesgos
+
+| Riesgo | Mitigación |
+|---|---|
+| "Ajustes restringidos" de Android 13+ para APK instalados fuera de una tienda: bloquean el acceso a notificaciones | Guía en la app y en el README (*Info de la app → ⋮ → Permitir ajustes restringidos*) |
+| Android 15 censura las notificaciones "sensibles" (con OTP) a las apps de escucha | Se descartan sin crear pendiente; documentado |
+| Los formatos de notificación cambian por banco y por versión | Un parser por banco con pruebas sobre ejemplos reales; si no coincide, no se inventa un movimiento |
+| Algunos bancos avisan por SMS, no por notificación | Compartir el texto hacia BOLSILLO (intent de Android). Nunca se leen SMS |
+| Capas de batería (Xiaomi, Samsung) matan el servicio de escucha | `requestRebind()` al abrir la app y una guía para excluir la app |
+| Contraste de la paleta (coral y amarillo como texto, verde en modo oscuro) | Roles separados (`accentText`, verde aclarado) y prueba automática de contraste AA |
+| iOS no permite leer notificaciones de otras apps | Fuera de alcance; el código queda compatible, sin detección |
+
+## Pendiente del equipo
+
+- Ejemplos reales **anonimizados** de notificaciones (compra, transferencia enviada y recibida)
+  de Nequi, Daviplata, Bancolombia, Nu y los demás bancos que usen. Hacen falta para la Fase 3.

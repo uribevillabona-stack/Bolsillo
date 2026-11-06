@@ -1,56 +1,142 @@
-# Welcome to your Expo app 👋
+# BOLSILLO
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App móvil de finanzas personales para jóvenes colombianos (16–26 años). Registra los gastos
+hormiga en menos de 3 segundos, detecta los movimientos a partir de las notificaciones de las
+apps bancarias (Android) y enseña a manejar la plata con micro-lecciones conectadas a tus datos.
 
-## Get started
+Proyecto de opción de grado — Ingeniería de Software, FET.
 
-1. Install dependencies
+**Costo cero:** sin servidor, sin base de datos en la nube, sin APIs de pago. Todo vive en el
+teléfono (SQLite) y se compila en tu propio computador.
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## Stack
 
-   ```bash
-   npx expo start
-   ```
+| Capa | Tecnología |
+|---|---|
+| App | Expo SDK 58 · React Native 0.88 · TypeScript estricto · React Compiler |
+| Navegación | Expo Router (rutas en `src/app/`) |
+| Estado | Zustand |
+| Datos (Fase 2) | expo-sqlite + Drizzle ORM (local-first) |
+| Animación | Reanimated 4 · Gesture Handler 3 · expo-haptics |
+| Íconos / Fuentes | Phosphor · Bricolage Grotesque, Geist, Geist Mono |
+| Detección (Fase 3) | Módulo nativo Kotlin con Expo Modules API |
+| Calidad | Jest · ESLint · Prettier |
 
-In the output, you'll find options to open the app in a
+## Requisitos (Windows)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Node.js 20 o superior y Git.
+- Un teléfono Android con **depuración USB** activada, y su cable.
+- JDK 17 y Android SDK. Se instalan solos con el script de abajo; **no hace falta Android
+  Studio** (solo si quieres usar el emulador).
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+> **Ubica el proyecto fuera de OneDrive** y en una ruta corta (p. ej. `C:\dev\bolsillo`).
+> OneDrive bloquea archivos durante la compilación, y en Windows las rutas largas rompen la
+> compilación nativa (CMake).
 
-## Get a fresh project
+### 1. Instalar las herramientas de Android (una sola vez)
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\setup-android.ps1
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Instala JDK 17 (Temurin), las herramientas de línea de comandos del SDK, platform-tools (`adb`),
+la plataforma 37, las build-tools 37, el NDK 27.1 y CMake. Además configura `JAVA_HOME`,
+`ANDROID_HOME` y `PATH`. No pide permisos de administrador. **Cierra y vuelve a abrir la
+terminal** al terminar.
 
-### Other setup steps
+**Rutas largas (obligatorio, una sola vez, como administrador).** React Native genera rutas
+C++ de más de 260 caracteres, y sin este ajuste la compilación falla con
+`Filename longer than 260 characters`. Abre PowerShell *como administrador* y ejecuta:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```powershell
+Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -Value 1 -Type DWord
+```
 
-## Learn more
+Además, el proyecto fija CMake 3.31.6, que trae ninja 1.12 con soporte de rutas largas, mediante
+`plugins/with-cmake-version.js`. El script ya lo instala.
 
-To learn more about developing your project with Expo, look at the following resources:
+### 2. Preparar el teléfono
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. *Ajustes → Acerca del teléfono →* toca 7 veces **Número de compilación**.
+2. *Ajustes → Opciones de desarrollador →* activa **Depuración USB**.
+3. Conecta el cable y acepta el diálogo "¿Permitir depuración USB?".
+4. Comprueba que se vea con `adb devices`.
 
-## Join the community
+### 3. Instalar y correr el development build
 
-Join our community of developers creating universal apps.
+```bash
+npm install
+npm run android        # compila e instala la app de desarrollo en el teléfono (1.ª vez: 10–20 min)
+npm start              # en adelante, solo esto: arranca Metro y la app recarga al guardar
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+BOLSILLO usa un *development build* (no Expo Go), porque tiene código nativo propio.
+
+## Comandos
+
+| Comando | Qué hace |
+|---|---|
+| `npm start` | Servidor de desarrollo (Metro) para el development build |
+| `npm run android` | Compila e instala el development build en el teléfono |
+| `npm run check` | Typecheck + lint + pruebas (correr antes de cada commit) |
+| `npm test` | Pruebas unitarias (Jest) |
+| `npm run format` | Formatea el código con Prettier |
+| `npm run prebuild` | Regenera la carpeta `android/` desde `app.json` |
+| `npm run android:release` | Compila e instala la versión de release |
+
+## Generar el APK para instalar sin Play Store
+
+La cuenta de Google Play cuesta y no hace falta para la sustentación: se entrega el APK.
+
+```bash
+npm run prebuild
+cd android
+./gradlew assembleRelease
+# APK: android/app/build/outputs/apk/release/app-release.apk
+```
+
+> **Estado actual:** el APK de release todavía se firma con la clave de depuración. Sirve para
+> instalarlo y probarlo, pero no para distribuirlo. En la Fase 6 se agrega la firma con una
+> clave propia (`keytool`, gratis) mediante un config plugin, sin guardar la clave en git.
+
+Para instalarlo en otro teléfono: envía el `.apk` (Drive, WhatsApp, cable), ábrelo y permite
+"instalar apps de origen desconocido" cuando Android lo pida.
+
+> **Detección automática (Fase 3), Android 13+:** como el APK no viene de una tienda, Android
+> bloquea el acceso a notificaciones hasta que el usuario vaya a *Info de la app → ⋮ → Permitir
+> ajustes restringidos*. La app guía este paso.
+
+## Estructura
+
+```
+src/
+  app/                 rutas (Expo Router): (tabs)/ inicio, movimientos, aprende, plan
+  components/          design system: Button, AmountText, Chip, ListRow, Sheet,
+                       NumericKeypad, ProgressRing (+ Text, Screen, TabBar, icons)
+  theme/               tokens: colores claro/oscuro, tipografía, espaciado (escala de 4), movimiento
+  features/            lógica por funcionalidad (expenses, detection, learn, budget, goals, onboarding)
+  lib/                 formato COP, fechas, hápticos
+modules/               módulos nativos (Fase 3: bank-notifications en Kotlin)
+content/lessons/       lecciones en JSON, editables sin tocar código (Fase 5)
+docs/                  plan, decisiones y documentación técnica
+scripts/               setup-android.ps1
+```
+
+La carpeta `android/` se genera con `prebuild` y **no se versiona**: toda la configuración nativa
+vive en `app.json` y en config plugins.
+
+## Decisiones de diseño
+
+- **Montos como enteros de pesos**, nunca `float`. El formato `$ 12.500` se hace a mano en
+  `src/lib/money.ts` (los datos de `Intl` de Hermes varían entre teléfonos).
+- **Contraste AA verificado por pruebas** (`src/theme/__tests__/contrast.test.ts`). El coral
+  `#FF6B4A` y el amarillo `#F2D479` se usan solo como relleno, porque como texto sobre el fondo
+  hueso no alcanzan AA; para texto de alerta existe `accentText`. En modo oscuro el verde de
+  marca se aclara (`#6CC39F`), porque `#0E4D3A` sobre `#111210` daría 1,9:1.
+- **Bordes de 1px en lugar de sombras**, radios de 12–16 px y cifras tabulares en los montos.
+- **Íconos importados uno por uno** desde Phosphor: el paquete completo agrega ~10 MB al bundle.
+- **No se leen SMS**: `READ_SMS` y `RECEIVE_SMS` están bloqueados en `app.json`.
+
+Plan completo por fases: [`docs/plan.md`](docs/plan.md).
