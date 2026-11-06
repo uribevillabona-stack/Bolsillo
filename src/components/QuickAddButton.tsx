@@ -17,6 +17,12 @@ import { TAB_BAR_HEIGHT } from './TabBar';
 
 const SIZE = 60;
 
+/**
+ * Espacio vertical que ocupan la barra de pestañas y el botón flotante
+ * (sin el inset del sistema). Lo usa el snackbar para no taparlos.
+ */
+export const QUICK_ADD_BUTTON_CLEARANCE = TAB_BAR_HEIGHT + space[4] + SIZE;
+
 export function QuickAddButton({ onPress }: { onPress: () => void }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();

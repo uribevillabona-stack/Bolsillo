@@ -1,32 +1,63 @@
 /**
  * Inicio. Solo lo esencial: saldo disponible del mes, gasto de hoy,
- * pendientes por confirmar, una recomendación y la próxima lección.
- *
- * Fase 1: estructura y estado vacío. Los datos reales llegan en la Fase 4.
+ * pendientes por confirmar, una recomendación y (Fase 5) la próxima lección.
  */
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { AmountText, Button, Screen, Text } from '@/components';
+import { AmountText, GearSixIcon, Screen, Text } from '@/components';
+import { PressableScale } from '@/components/PressableScale';
 import { TAB_BAR_HEIGHT } from '@/components/TabBar';
-import { daysLeftLabel, monthName } from '@/lib/dates';
-import { hairline, space, useTheme } from '@/theme';
+import { useProfile, useTransactionsBetween } from '@/db/hooks';
+import { projectionSentence } from '@/features/expenses/hormigas-stats';
+import { monthTotals } from '@/features/expenses/month-totals';
+import { useHormigaSummary } from '@/features/expenses/use-hormigas';
+import { daysLeftLabel, monthName, startOfMonth, startOfNextMonth } from '@/lib/dates';
+import { formatCOP } from '@/lib/money';
+import { AJUSTES_HREF } from '@/lib/routes';
+import { useNow } from '@/lib/use-now';
+import { hairline, minTouchTarget, space, useTheme } from '@/theme';
 
 export default function InicioScreen() {
   const { colors } = useTheme();
-  const today = new Date();
+  const now = useNow();
+  const profile = useProfile();
+  const rows = useTransactionsBetween(startOfMonth(now).getTime(), startOfNextMonth(now).getTime());
+  const totals = monthTotals(rows, now, profile?.monthlyIncomeEstimate ?? 0);
+  const hormigas = useHormigaSummary(now);
+  const topHormiga = hormigas.categories.find((c) => c.annualProjection > 0);
+  const firstName = profile?.name.split(' ')[0];
 
   return (
     <Screen bottomInset={TAB_BAR_HEIGHT}>
-      <Text variant="overline" tone="inkMuted">
-        {monthName(today)} · {daysLeftLabel(today)}
-      </Text>
+      <View style={styles.topRow}>
+        <Text variant="overline" tone="inkMuted" style={styles.flex}>
+          {monthName(now)} · {daysLeftLabel(now)}
+        </Text>
+        <PressableScale
+          accessibilityRole="button"
+          accessibilityLabel="Ajustes"
+          onPress={() => router.push(AJUSTES_HREF)}
+          style={styles.iconButton}>
+          <GearSixIcon size={24} color={colors.ink} />
+        </PressableScale>
+      </View>
 
       <View style={styles.hero}>
         <Text variant="label" tone="inkMuted">
-          Disponible este mes
+          {firstName ? `${firstName}, te quedan este mes` : 'Disponible este mes'}
         </Text>
-        <AmountText amount={0} size="hero" testID="saldo-mes" />
+        <AmountText
+          amount={totals.available}
+          size="hero"
+          tone={totals.available < 0 ? 'accentText' : 'ink'}
+          testID="saldo-mes"
+        />
+        {totals.usedIncomeEstimate ? (
+          <Text variant="caption" tone="inkMuted">
+            Con tu ingreso de referencia de {formatCOP(profile?.monthlyIncomeEstimate ?? 0)}.
+          </Text>
+        ) : null}
       </View>
 
       <View style={[styles.split, { borderColor: colors.line }]}>
@@ -34,7 +65,7 @@ export default function InicioScreen() {
           <Text variant="caption" tone="inkMuted">
             Hoy
           </Text>
-          <AmountText amount={0} size="medium" />
+          <AmountText amount={totals.today} size="medium" />
         </View>
         <View style={[styles.splitCell, styles.splitRight, { borderLeftColor: colors.line }]}>
           <Text variant="caption" tone="inkMuted">
@@ -44,28 +75,49 @@ export default function InicioScreen() {
         </View>
       </View>
 
-      <View style={styles.empty}>
-        <Text variant="title">Arranca por lo pequeño.</Text>
-        <Text variant="body" tone="inkMuted">
-          Anota tu próximo tinto con el botón +. Con una semana de datos ya te podemos decir a dónde
-          se te va la plata.
-        </Text>
-      </View>
-
-      {__DEV__ ? (
-        <Button
-          label="Catálogo de componentes"
-          variant="outline"
-          onPress={() => router.push('/catalogo')}
-        />
+      {rows.length === 0 ? (
+        <View style={styles.block}>
+          <Text variant="title">Arranca por lo pequeño.</Text>
+          <Text variant="body" tone="inkMuted">
+            Anota tu próximo tinto con el botón +. Con una semana de datos ya te podemos decir a
+            dónde se te va la plata.
+          </Text>
+        </View>
+      ) : topHormiga ? (
+        <PressableScale
+          onPress={() => router.push('/movimientos?vista=hormigas')}
+          accessibilityRole="button"
+          accessibilityHint="Abre la vista de gastos hormiga"
+          scaleTo={0.99}
+          style={[styles.block, styles.insight, { borderColor: colors.line }]}>
+          <Text variant="overline" tone="inkMuted">
+            Gastos hormiga
+          </Text>
+          <Text variant="title">{projectionSentence(topHormiga, formatCOP)}</Text>
+          <Text variant="caption" tone="inkMuted">
+            Llevas {formatCOP(hormigas.monthTotal)} en hormigas este mes.
+          </Text>
+        </PressableScale>
       ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    width: minTouchTarget,
+    height: minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: -space[3],
+  },
   hero: {
-    marginTop: space[10],
+    marginTop: space[8],
     gap: space[1],
   },
   split: {
@@ -83,10 +135,13 @@ const styles = StyleSheet.create({
     paddingLeft: space[4],
     borderLeftWidth: hairline,
   },
-  empty: {
-    marginTop: space[12],
-    marginBottom: space[8],
+  block: {
+    marginTop: space[10],
     gap: space[2],
-    maxWidth: 320,
+    maxWidth: 360,
+  },
+  insight: {
+    borderTopWidth: hairline,
+    paddingTop: space[4],
   },
 });

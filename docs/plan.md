@@ -12,13 +12,17 @@ se aprobaron. Se actualiza al cerrar cada fase.
 | 2026-11-05 | `zod` para validar el JSON de respaldo al importarlo. |
 | 2026-11-05 | Rutas en `src/app/` (convención de Expo SDK 58) en lugar de `app/` en la raíz: todo el código queda bajo `src/`. |
 | 2026-11-05 | El onboarding se construye en la Fase 2, junto con la base de datos (necesita la tabla `profile`). |
+| 2026-11-05 | Sin `expo-document-picker`: `expo-file-system` (SDK 58) ya trae `File.pickFileAsync()`. Una dependencia menos. |
+| 2026-11-05 | Las tablas de fases futuras (pendientes, reglas de comercio, presupuestos, lecciones) llegan como migraciones nuevas en su fase, no en la inicial: así se ve cómo evoluciona el esquema. |
+| 2026-11-05 | Proyección anual de hormigas con ventana móvil de 7 a 30 días según la historia del usuario (ver `hormigas-stats.ts`). |
+| 2026-11-05 | Importar un respaldo es la única acción con confirmación explícita (reemplaza todo); además se puede deshacer. El resto usa "deshacer" sin diálogos. |
 
 ## Fases
 
 | Fase | Entregable | Estado |
 |---|---|---|
 | 1. Base | Expo SDK 58 + TS estricto, tema, design system, navegación, Jest/ESLint/Prettier, script de herramientas Android | Hecha |
-| 2. Gastos hormiga | Drizzle + migraciones, onboarding, registro rápido con persistencia y deshacer, vista Hormigas con proyección anual, atajos editables, exportar/importar JSON | Pendiente |
+| 2. Gastos hormiga | Drizzle + migraciones, onboarding, registro rápido con persistencia y deshacer, vista Hormigas con proyección anual, atajos editables, exportar/importar JSON | Hecha |
 | 3. Detección | Módulo Kotlin `NotificationListenerService` + cola nativa, parsers por banco con pruebas, deduplicación, bandeja de pendientes, aprendizaje comercio → categoría, intent de compartir, `docs/deteccion.md` | Pendiente |
 | 4. Plan e Inicio | Presupuesto por categoría con alerta al 80 %, Apartados, dashboard, motor de recomendaciones | Pendiente |
 | 5. Aprende | 5 lecciones en JSON + quiz, desbloqueo por comportamiento, racha semanal | Pendiente |

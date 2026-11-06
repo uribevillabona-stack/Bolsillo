@@ -18,7 +18,7 @@ teléfono (SQLite) y se compila en tu propio computador.
 | App | Expo SDK 58 · React Native 0.88 · TypeScript estricto · React Compiler |
 | Navegación | Expo Router (rutas en `src/app/`) |
 | Estado | Zustand |
-| Datos (Fase 2) | expo-sqlite + Drizzle ORM (local-first) |
+| Datos | expo-sqlite + Drizzle ORM (local-first, migraciones versionadas) · zod para respaldos |
 | Animación | Reanimated 4 · Gesture Handler 3 · expo-haptics |
 | Íconos / Fuentes | Phosphor · Bricolage Grotesque, Geist, Geist Mono |
 | Detección (Fase 3) | Módulo nativo Kotlin con Expo Modules API |
@@ -84,6 +84,7 @@ BOLSILLO usa un *development build* (no Expo Go), porque tiene código nativo pr
 | `npm test` | Pruebas unitarias (Jest) |
 | `npm run format` | Formatea el código con Prettier |
 | `npm run prebuild` | Regenera la carpeta `android/` desde `app.json` |
+| `npm run db:generate` | Genera una migración SQL tras cambiar `src/db/schema.ts` |
 | `npm run android:release` | Compila e instala la versión de release |
 
 ## Generar el APK para instalar sin Play Store
@@ -140,3 +141,24 @@ vive en `app.json` y en config plugins.
 - **No se leen SMS**: `READ_SMS` y `RECEIVE_SMS` están bloqueados en `app.json`.
 
 Plan completo por fases: [`docs/plan.md`](docs/plan.md).
+
+## Datos y respaldo
+
+- Todo vive en `bolsillo.db` (SQLite) dentro del almacenamiento privado de la app. Al abrirla se
+  aplican las migraciones pendientes de `src/db/migrations/` y se siembran categorías y atajos.
+- **Cambiar el esquema:** edita `src/db/schema.ts` y corre `npm run db:generate`. Nunca edites
+  una migración ya publicada; crea una nueva.
+- **Respaldo:** Ajustes → Respaldo exporta un JSON (formato en `src/features/backup/backup-format.ts`,
+  validado con zod) y lo comparte por Drive, WhatsApp o correo. Restaurar reemplaza todo, en
+  una sola transacción, y se puede deshacer durante 5 segundos.
+
+## Problemas conocidos
+
+- **Pantalla en blanco al abrir la app en desarrollo:** Metro no responde. Si se agregó una
+  librería nativa o se cambió `metro.config.js` o `babel.config.js`, reinicia Metro
+  (`npm start -- --clear`). `metro.config.js` excluye las salidas de compilación nativa
+  (`android/build`, `.cxx`), que suman varios GB y hacían que Metro nunca respondiera.
+- **Librería nativa nueva:** hay que recompilar el development build (`npm run android`); el APK
+  instalado no la trae.
+- **Rutas tipadas en Windows:** `@expo/cli` tipa `src/app/ajustes/index.tsx` como
+  `/ajustes/index` en vez de `/ajustes`. Ver `src/lib/routes.ts`.

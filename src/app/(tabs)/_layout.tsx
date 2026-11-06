@@ -22,8 +22,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="plan" />
       </Tabs>
       <QuickAddButton onPress={show} />
-      {/* Fase 2: onSave inserta en SQLite y muestra el snackbar de deshacer. */}
-      <QuickAddSheet visible={open} onClose={hide} onSave={hide} />
+      <QuickAddSheet visible={open} onClose={hide} />
     </>
   );
 }

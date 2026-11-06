@@ -60,6 +60,7 @@ export default function CatalogoScreen() {
         <View style={styles.row}>
           {PREFERENCES.map((p) => (
             <Chip
+              role="radio"
               key={p.id}
               label={p.label}
               selected={preference === p.id}

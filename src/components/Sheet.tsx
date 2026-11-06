@@ -109,7 +109,9 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
       statusBarTranslucent
       navigationBarTranslucent
       onRequestClose={onClose}>
-      <GestureHandlerRootView style={styles.root}>
+      {/* Mientras se cierra (animación de salida) ya no recibe toques: evita
+          que un doble toque en "Guardar" registre el gasto dos veces. */}
+      <GestureHandlerRootView style={styles.root} pointerEvents={visible ? 'auto' : 'none'}>
         <Animated.View
           style={[StyleSheet.absoluteFill, { backgroundColor: colors.scrim }, backdropStyle]}>
           <Pressable

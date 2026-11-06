@@ -19,6 +19,11 @@ export interface ChipProps {
   /** Monto predeterminado, para los atajos de gasto. */
   amount?: number;
   testID?: string;
+  /**
+   * Rol para el lector de pantalla. Dentro de un grupo de opciones excluyentes
+   * usar 'radio'; como filtro de vistas, 'tab'.
+   */
+  role?: 'button' | 'radio' | 'tab';
 }
 
 export function Chip({
@@ -28,6 +33,7 @@ export function Chip({
   icon: IconComponent,
   amount,
   testID,
+  role = 'button',
 }: ChipProps) {
   const { colors } = useTheme();
   const fg = selected ? colors.bg : colors.ink;
@@ -38,9 +44,9 @@ export function Chip({
       testID={testID}
       onPress={onPress}
       disabled={!onPress}
-      accessibilityRole="button"
+      accessibilityRole={role}
       accessibilityLabel={a11yLabel}
-      accessibilityState={{ selected }}
+      accessibilityState={role === 'radio' ? { checked: selected } : { selected }}
       style={[
         styles.chip,
         {
