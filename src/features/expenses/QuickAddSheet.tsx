@@ -1,58 +1,107 @@
 /**
  * Registro rápido de gastos hormiga.
  *
- * Flujo de 1 toque: tocar un atajo ("Tinto $ 2.500") llena el monto, y
- * "Guardar" lo registra. Para montos libres, el teclado propio.
- *
- * Fase 1: interfaz y teclado. La persistencia en SQLite, la categoría, la
- * nota, la fecha y el "deshacer" llegan en la Fase 2 (`onSave` es el punto de
- * conexión).
+ * Flujo de 1 toque: tocar un atajo ("Tinto $ 2.500") llena monto y
+ * categoría; "Guardar" lo registra y ofrece deshacer por 5 segundos.
+ * Para montos libres, el teclado propio. Categoría, fecha y nota son
+ * opcionales y se cambian sin salir del sheet (el panel inferior alterna
+ * entre teclado, categorías y nota, así el sheet no cambia de alto).
  */
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { AmountText, Button, Chip, NumericKeypad, Sheet, Text } from '@/components';
+import {
+  AmountText,
+  Button,
+  CalendarBlankIcon,
+  Chip,
+  NotePencilIcon,
+  NumericKeypad,
+  Sheet,
+  showSnackbar,
+  TagIcon,
+  Text,
+  TextField,
+} from '@/components';
+import { db } from '@/db/client';
+import { useCategories, useShortcuts } from '@/db/hooks';
+import type { TransactionSource } from '@/db/schema';
+import { iconFor } from '@/features/categories/category-icons';
 import { haptics } from '@/lib/haptics';
-import { digitsToAmount } from '@/lib/money';
+import { digitsToAmount, formatCOP } from '@/lib/money';
 import { space } from '@/theme';
 
-import { DEFAULT_SHORTCUTS } from './default-shortcuts';
+import {
+  DAY_OPTIONS,
+  nextDayOption,
+  NOTE_MAX,
+  occurredAtFor,
+  savedMessage,
+} from './quick-add-logic';
+import { addExpense, deleteTransaction } from './transactions-repo';
 
-export interface QuickAddDraft {
-  amount: number;
-  shortcutId: string | null;
-}
+type Panel = 'keypad' | 'category' | 'note';
 
 export interface QuickAddSheetProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (draft: QuickAddDraft) => void;
 }
 
-export function QuickAddSheet({ visible, onClose, onSave }: QuickAddSheetProps) {
+export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
+  const shortcuts = useShortcuts();
+  const categories = useCategories('expense');
+
   const [digits, setDigits] = useState('');
-  const [shortcutId, setShortcutId] = useState<string | null>(null);
-  const amount = digitsToAmount(digits);
+  const [shortcutId, setShortcutId] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [dayOption, setDayOption] = useState(0);
+  const [note, setNote] = useState('');
+  const [panel, setPanel] = useState<Panel>('keypad');
 
   // Se limpia al ABRIR (estado derivado en render), no al cerrar: así el
-  // sheet no se ve vacío ("$ 0") mientras baja en la animación de salida.
+  // sheet no se ve vacío mientras baja en la animación de salida.
   const [wasVisible, setWasVisible] = useState(visible);
   if (visible !== wasVisible) {
     setWasVisible(visible);
     if (visible) {
       setDigits('');
       setShortcutId(null);
+      setCategoryId(null);
+      setDayOption(0);
+      setNote('');
+      setPanel('keypad');
     }
   }
+
+  const amount = digitsToAmount(digits);
+  const shortcut = shortcuts.find((s) => s.id === shortcutId) ?? null;
+  const category = categories.find((c) => c.id === categoryId) ?? null;
+  const CategoryIcon = category ? iconFor(category.icon) : TagIcon;
+
+  const save = () => {
+    const source: TransactionSource = shortcut ? 'shortcut' : 'manual';
+    const label = shortcut?.label ?? category?.name ?? null;
+    const row = addExpense(db, {
+      amount,
+      categoryId,
+      note,
+      occurredAt: occurredAtFor(dayOption, new Date()),
+      source,
+    });
+    haptics.confirm();
+    onClose();
+    showSnackbar(savedMessage(label, formatCOP(amount)), {
+      label: 'Deshacer',
+      onPress: () => deleteTransaction(db, row.id),
+    });
+  };
 
   return (
     <Sheet visible={visible} onClose={onClose} title="Registrar gasto" hideTitle>
       <View style={styles.header}>
         <Text variant="overline" tone="inkMuted">
-          {shortcutId
-            ? (DEFAULT_SHORTCUTS.find((s) => s.id === shortcutId)?.label ?? 'Gasto')
-            : 'Nuevo gasto'}
+          {shortcut?.label ?? category?.name ?? 'Nuevo gasto'}
         </Text>
         <AmountText
           amount={amount}
@@ -62,35 +111,98 @@ export function QuickAddSheet({ visible, onClose, onSave }: QuickAddSheetProps) 
         />
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.shortcuts}
-        style={styles.shortcutsScroll}>
-        {DEFAULT_SHORTCUTS.map((s) => (
-          <Chip
-            key={s.id}
-            label={s.label}
-            icon={s.icon}
-            amount={s.amount}
-            selected={shortcutId === s.id}
-            onPress={() => {
-              haptics.tick();
-              setShortcutId(s.id);
-              setDigits(String(s.amount));
+      <View style={styles.details}>
+        <Chip
+          label={category?.name ?? 'Categoría'}
+          icon={CategoryIcon}
+          selected={panel === 'category'}
+          onPress={() => setPanel(panel === 'category' ? 'keypad' : 'category')}
+        />
+        <Chip
+          label={DAY_OPTIONS[dayOption]!.label}
+          icon={CalendarBlankIcon}
+          onPress={() => {
+            haptics.tick();
+            setDayOption(nextDayOption(dayOption));
+          }}
+        />
+        <Chip
+          label={note.trim() ? truncate(note.trim(), 16) : 'Nota'}
+          icon={NotePencilIcon}
+          selected={panel === 'note'}
+          onPress={() => setPanel(panel === 'note' ? 'keypad' : 'note')}
+        />
+      </View>
+
+      {panel === 'keypad' ? (
+        <>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.rowContent}
+            style={styles.rowScroll}>
+            {shortcuts.map((s) => (
+              <Chip
+                key={s.id}
+                label={s.label}
+                icon={iconFor(s.icon)}
+                amount={s.amount}
+                selected={shortcutId === s.id}
+                onPress={() => {
+                  haptics.tick();
+                  setShortcutId(s.id);
+                  setCategoryId(s.categoryId);
+                  setDigits(String(s.amount));
+                }}
+              />
+            ))}
+          </ScrollView>
+          <NumericKeypad
+            value={digits}
+            onChange={(next) => {
+              setDigits(next);
+              // Si edita el monto a mano, ya no es el atajo (la categoría se mantiene).
+              if (shortcutId !== null) setShortcutId(null);
             }}
           />
-        ))}
-      </ScrollView>
+        </>
+      ) : null}
 
-      <NumericKeypad
-        value={digits}
-        onChange={(next) => {
-          setDigits(next);
-          // Si el usuario edita el monto a mano, el atajo deja de aplicar.
-          if (shortcutId) setShortcutId(null);
-        }}
-      />
+      {panel === 'category' ? (
+        <View style={styles.categoryGrid} accessibilityRole="radiogroup">
+          {categories.map((c) => (
+            <Chip
+              role="radio"
+              key={c.id}
+              label={c.name}
+              icon={iconFor(c.icon)}
+              selected={categoryId === c.id}
+              onPress={() => {
+                haptics.tick();
+                setCategoryId(c.id);
+                setShortcutId(null);
+                setPanel('keypad');
+              }}
+            />
+          ))}
+        </View>
+      ) : null}
+
+      {panel === 'note' ? (
+        <View style={styles.notePanel}>
+          <TextField
+            label="Nota (opcional)"
+            value={note}
+            onChangeText={setNote}
+            maxLength={NOTE_MAX}
+            placeholder="Con quién, dónde, por qué…"
+            autoFocus
+            returnKeyType="done"
+            onSubmitEditing={() => setPanel('keypad')}
+          />
+          <Button label="Listo" variant="outline" onPress={() => setPanel('keypad')} />
+        </View>
+      ) : null}
 
       <View style={styles.footer}>
         <Button
@@ -100,10 +212,7 @@ export function QuickAddSheet({ visible, onClose, onSave }: QuickAddSheetProps) 
           block
           disabled={amount === 0}
           testID="quick-add-save"
-          onPress={() => {
-            haptics.confirm();
-            onSave({ amount, shortcutId });
-          }}
+          onPress={save}
         />
       </View>
     </Sheet>
@@ -113,18 +222,38 @@ export function QuickAddSheet({ visible, onClose, onSave }: QuickAddSheetProps) 
 const styles = StyleSheet.create({
   header: {
     gap: space[1],
-    marginBottom: space[4],
+    marginBottom: space[3],
   },
-  shortcutsScroll: {
+  details: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space[2],
+    marginBottom: space[3],
+  },
+  rowScroll: {
     marginHorizontal: -space[5],
     marginBottom: space[3],
     flexGrow: 0,
   },
-  shortcuts: {
+  rowContent: {
     gap: space[2],
     paddingHorizontal: space[5],
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space[2],
+    paddingVertical: space[2],
+  },
+  notePanel: {
+    gap: space[3],
+    paddingVertical: space[2],
   },
   footer: {
     marginTop: space[3],
   },
 });
+
+function truncate(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
