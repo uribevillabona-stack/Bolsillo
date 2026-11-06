@@ -146,6 +146,7 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
                 sin competir con un scroll. */}
             <ScrollView
               style={styles.body}
+              contentContainerStyle={styles.bodyContent}
               scrollEnabled={scrollable}
               showsVerticalScrollIndicator={scrollable}
               bounces={false}
@@ -171,11 +172,15 @@ const styles = StyleSheet.create({
     borderTopRightRadius: radius.md,
     borderWidth: hairline,
     borderBottomWidth: 0,
-    paddingHorizontal: screenGutter,
     paddingTop: space[2],
   },
   body: {
     flexShrink: 1,
+  },
+  // El margen lateral va dentro del scroll (no en el sheet) para que el
+  // contenido con scroll horizontal (atajos) pueda llegar hasta el borde.
+  bodyContent: {
+    paddingHorizontal: screenGutter,
   },
   handle: {
     alignSelf: 'center',
@@ -186,5 +191,6 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: space[4],
+    paddingHorizontal: screenGutter,
   },
 });

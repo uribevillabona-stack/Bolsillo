@@ -55,14 +55,14 @@ export const textStyles = {
     fontFamily: fontFamily.displayHeavy,
     fontSize: 64,
     lineHeight: 68,
-    letterSpacing: -2.5,
+    letterSpacing: -0.5, // más apretado pega el punto de miles al dígito
     fontVariant: tabular,
   },
   amountLarge: {
     fontFamily: fontFamily.display,
     fontSize: 40,
     lineHeight: 44,
-    letterSpacing: -1.2,
+    letterSpacing: -0.4,
     fontVariant: tabular,
   },
   amountMedium: {
