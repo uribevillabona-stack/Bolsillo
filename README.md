@@ -98,9 +98,35 @@ cd android
 # APK: android/app/build/outputs/apk/release/app-release.apk
 ```
 
-> **Estado actual:** el APK de release todavía se firma con la clave de depuración. Sirve para
-> instalarlo y probarlo, pero no para distribuirlo. En la Fase 6 se agrega la firma con una
-> clave propia (`keytool`, gratis) mediante un config plugin, sin guardar la clave en git.
+### APK firmado con la clave propia
+
+El APK de release se firma con una clave propia del proyecto (gratis, con `keytool` del JDK).
+La clave **no está en el repositorio**: el config plugin `plugins/with-release-signing.js`
+la toma de `%USERPROFILE%\.gradle\gradle.properties`. Para crearla en un computador nuevo:
+
+```powershell
+mkdir C:\dev\bolsillo-keys
+C:\dev\tools\jdk-17\bin\keytool.exe -genkeypair -v -storetype PKCS12 `
+  -keystore C:\dev\bolsillo-keys\bolsillo-release.keystore -alias bolsillo `
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Y agrega a `%USERPROFILE%\.gradle\gradle.properties` (con la contraseña que escogiste):
+
+```properties
+BOLSILLO_RELEASE_STORE_FILE=C:/dev/bolsillo-keys/bolsillo-release.keystore
+BOLSILLO_RELEASE_STORE_PASSWORD=tu-contraseña
+BOLSILLO_RELEASE_KEY_ALIAS=bolsillo
+BOLSILLO_RELEASE_KEY_PASSWORD=tu-contraseña
+```
+
+> **Guarda una copia de la clave** (USB o tu Drive personal). Si se pierde, un APK nuevo no
+> puede actualizar el que ya está instalado: habría que desinstalar y perder los datos (salvo
+> que se exporte un respaldo antes). Sin estas propiedades el release se firma con la clave de
+> depuración: compila igual, pero sirve solo para pruebas.
+
+Para verificar con qué clave quedó firmado:
+`%LOCALAPPDATA%\Android\Sdk\build-tools\37.0.0\apksigner.bat verify --print-certs app-release.apk`.
 
 Para instalarlo en otro teléfono: envía el `.apk` (Drive, WhatsApp, cable), ábrelo y permite
 "instalar apps de origen desconocido" cuando Android lo pida.
@@ -120,7 +146,7 @@ src/
   features/            lógica por funcionalidad (expenses, detection, learn, budget, goals, onboarding)
   lib/                 formato COP, fechas, hápticos
 modules/               módulos nativos (Fase 3: bank-notifications en Kotlin)
-content/lessons/       lecciones en JSON, editables sin tocar código (Fase 5)
+content/lessons/       lecciones en JSON, editables sin tocar código (ver su README)
 docs/                  plan, decisiones y documentación técnica
 scripts/               setup-android.ps1
 ```

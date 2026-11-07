@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Claves de firma: nunca al repositorio (ver README → APK firmado)
+*.keystore

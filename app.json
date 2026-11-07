@@ -47,6 +47,7 @@
           "version": "3.31.6"
         }
       ],
+      "./plugins/with-release-signing",
       "expo-sqlite",
       "expo-sharing"
     ],
