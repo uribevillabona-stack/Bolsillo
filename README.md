@@ -98,6 +98,11 @@ cd android
 # APK: android/app/build/outputs/apk/release/app-release.apk
 ```
 
+El APK trae solo las arquitecturas ARM (`armeabi-v7a` y `arm64-v8a`), que cubren todos los
+celulares reales; x86 solo sirve para emuladores. Se fija en `app.json` con el config plugin
+`plugins/with-architectures.js`. El development build (`npm run android`) no cambia: compila
+solo la arquitectura del dispositivo conectado.
+
 ### APK firmado con la clave propia
 
 El APK de release se firma con una clave propia del proyecto (gratis, con `keytool` del JDK).

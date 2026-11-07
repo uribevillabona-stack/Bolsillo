@@ -35,12 +35,23 @@ module.exports = function withReleaseSigning(config) {
       throw new Error('with-release-signing: se esperaba android/app/build.gradle en Groovy.');
     }
     let src = cfg.modResults.contents;
-    if (src.includes(MARKER)) return cfg;
+    if (src.includes(MARKER)) {
+      // Ya aplicado. Si se generó con la versión vieja (sin paréntesis
+      // exteriores, ver abajo), se repara aquí: sin esto, un prebuild sin
+      // --clean dejaría la línea que rompe el build.
+      cfg.modResults.contents = src.replace(
+        /signingConfig \((project\.hasProperty[^\n]*?)\) \? signingConfigs\.release : signingConfigs\.debug/,
+        'signingConfig(($1) ? signingConfigs.release : signingConfigs.debug)',
+      );
+      return cfg;
+    }
 
     // 1. Agrega `release` dentro de `signingConfigs { ... }`, junto a `debug`.
     const signingAnchor = /signingConfigs\s*\{\n/;
     if (!signingAnchor.test(src)) {
-      throw new Error('with-release-signing: no se encontró `signingConfigs {` en app/build.gradle.');
+      throw new Error(
+        'with-release-signing: no se encontró `signingConfigs {` en app/build.gradle.',
+      );
     }
     const releaseConfig = [
       `        ${MARKER}`,
@@ -57,15 +68,19 @@ module.exports = function withReleaseSigning(config) {
     src = src.replace(signingAnchor, (m) => `${m}${releaseConfig}`);
 
     // 2. En `buildTypes.release`, usa la clave propia si está configurada.
-    const releaseBlock = /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)signingConfig signingConfigs\.debug/;
+    const releaseBlock =
+      /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)signingConfig signingConfigs\.debug/;
     if (!releaseBlock.test(src)) {
       throw new Error(
         'with-release-signing: no se encontró `signingConfig signingConfigs.debug` en buildTypes.release.',
       );
     }
+    // Paréntesis exteriores obligatorios: sin ellos Groovy lee
+    // `signingConfig (cond) ? a : b` como `signingConfig(cond) ? a : b` y le
+    // pasa el booleano ("Boolean cannot be cast to SigningConfig").
     src = src.replace(
       releaseBlock,
-      `$1signingConfig (${HAS_ALL}) ? signingConfigs.release : signingConfigs.debug`,
+      `$1signingConfig((${HAS_ALL}) ? signingConfigs.release : signingConfigs.debug)`,
     );
 
     cfg.modResults.contents = src;

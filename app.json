@@ -21,10 +21,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "blockedPermissions": [
-        "android.permission.READ_SMS",
-        "android.permission.RECEIVE_SMS"
-      ]
+      "blockedPermissions": ["android.permission.READ_SMS", "android.permission.RECEIVE_SMS"]
     },
     "plugins": [
       "expo-router",
@@ -48,6 +45,12 @@
         }
       ],
       "./plugins/with-release-signing",
+      [
+        "./plugins/with-architectures",
+        {
+          "architectures": ["armeabi-v7a", "arm64-v8a"]
+        }
+      ],
       "expo-sqlite",
       "expo-sharing"
     ],
