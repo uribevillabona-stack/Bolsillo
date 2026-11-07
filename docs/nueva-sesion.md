@@ -50,10 +50,11 @@ Pega esto al empezar:
 
 ## Qué sigue (en orden)
 
-1. Revisar si terminó `assembleRelease` (log en `%TEMP%
-elease.log`). Ojo: se compiló con
-   la versión anterior del plugin; para el APK final, correr de nuevo
-   `npx expo prebuild --platform android --clean --no-install` y `cd android && ./gradlew assembleRelease`.
+1. APK de release: compiló y quedó firmado con la clave propia (verificado con apksigner:
+   `CN=BOLSILLO, OU=Ingenieria de Software, O=FET`). Pesa ~110 MB porque trae todas las
+   arquitecturas; para la entrega se puede reducir a `arm64-v8a` (`reactNativeArchitectures` en
+   `android/gradle.properties`, mejor vía config plugin). Se compiló con la versión anterior del
+   plugin: para el APK final, volver a correr prebuild `--clean` y `assembleRelease`.
 2. Probar `RouteError` (forzar un error en una pantalla en desarrollo y quitarlo).
 3. Verificar el APK firmado: `apksigner verify --print-certs android/app/build/outputs/apk/release/app-release.apk`.
    **No instalarlo encima del development build:** la firma es distinta, Android obliga a
