@@ -9,7 +9,7 @@
  *   letra del sistema aumentado), el texto se reduce para caber en el ancho.
  * - El lector de pantalla oye "12500 pesos", no "dólar doce punto quinientos".
  */
-import type { StyleProp, TextStyle } from 'react-native';
+import type { StyleProp, TextProps, TextStyle } from 'react-native';
 
 import { formatCOP, spokenCOP } from '@/lib/money';
 import { textStyles, useTheme } from '@/theme';
@@ -41,6 +41,8 @@ export interface AmountTextProps {
   /** Muestra `+` en positivos (ingresos). */
   signed?: boolean;
   style?: StyleProp<TextStyle>;
+  /** "polite" en los teclados: el lector anuncia el monto al teclear. */
+  accessibilityLiveRegion?: TextProps['accessibilityLiveRegion'];
   testID?: string;
 }
 
@@ -50,11 +52,12 @@ export function AmountText({
   tone = 'ink',
   signed = false,
   style,
+  accessibilityLiveRegion,
   testID,
 }: AmountTextProps) {
   const { colors } = useTheme();
   const variant = variantBySize[size];
-  const a11y = { accessibilityLabel: spokenCOP(amount), testID };
+  const a11y = { accessibilityLabel: spokenCOP(amount), accessibilityLiveRegion, testID };
 
   // En tamaño pequeño el monto va en línea con texto: sin jerarquía interna.
   if (size === 'small') {

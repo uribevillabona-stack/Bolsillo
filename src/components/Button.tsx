@@ -29,6 +29,11 @@ export interface ButtonProps {
   /** Ocupa todo el ancho disponible. */
   block?: boolean;
   accessibilityHint?: string;
+  /**
+   * Si se define, el botón es una opción de un grupo excluyente (rol radio) y
+   * el lector de pantalla anuncia si está elegida; no solo el color la marca.
+   */
+  selected?: boolean;
   testID?: string;
 }
 
@@ -54,6 +59,7 @@ export function Button({
   disabled = false,
   block = false,
   accessibilityHint,
+  selected,
   testID,
 }: ButtonProps) {
   const { colors } = useTheme();
@@ -64,10 +70,10 @@ export function Button({
   return (
     <PressableScale
       testID={testID}
-      accessibilityRole="button"
+      accessibilityRole={selected === undefined ? 'button' : 'radio'}
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
+      accessibilityState={selected === undefined ? { disabled } : { disabled, checked: selected }}
       disabled={disabled}
       onPress={() => {
         haptics.tap();

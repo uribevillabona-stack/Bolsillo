@@ -11,6 +11,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, showSnackbar, Text } from '@/components';
 import { db } from '@/db/client';
 import { haptics } from '@/lib/haptics';
+import { speakMoney } from '@/lib/money';
 import { hairline, space, useTheme } from '@/theme';
 
 import type { Recommendation } from './recommendations';
@@ -22,8 +23,14 @@ export function RecommendationCard({ rec }: { rec: Recommendation }) {
     rec.tone === 'alert' ? colors.accent : rec.tone === 'good' ? colors.butter : null;
 
   const dismiss = () => {
+    try {
+      dismissRecommendation(db, rec.key);
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      return;
+    }
     haptics.tap();
-    dismissRecommendation(db, rec.key);
     showSnackbar('Listo, no te lo mostramos por unos días', {
       label: 'Deshacer',
       onPress: () => undoDismiss(db, rec.key),
@@ -34,7 +41,9 @@ export function RecommendationCard({ rec }: { rec: Recommendation }) {
     <View
       style={[styles.block, { borderTopColor: colors.line }]}
       testID="recomendacion"
-      accessibilityLabel={`Recomendación. ${rec.title}${rec.body ? ` ${rec.body}` : ''}`}>
+      accessibilityLabel={speakMoney(
+        `Recomendación. ${rec.title}${rec.body ? ` ${rec.body}` : ''}`,
+      )}>
       <View style={styles.topic}>
         {markColor ? <View style={[styles.mark, { backgroundColor: markColor }]} /> : null}
         <Text variant="overline" tone="inkMuted">

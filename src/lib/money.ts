@@ -88,3 +88,22 @@ function assertSafeAmount(amount: number): void {
 export function keepMoneyTogether(text: string): string {
   return text.replace(/\$ (?=\d)/g, `$${NBSP}`);
 }
+
+/**
+ * Monto tal como lo escribe `formatCOP` dentro de un texto libre: signo
+ * opcional (− o +), "$", espacio de no separación y miles con punto.
+ */
+const FORMATTED_COP = /([−+]?)\$\u00A0(\d{1,3}(?:\.\d{3})*)(?!\d)/g;
+
+/**
+ * Versión para lectores de pantalla de un texto con montos embebidos
+ * ("Gastado $ 12.500" → "Gastado 12500 pesos"). Cada monto con el formato
+ * exacto de `formatCOP` se cambia por su `spokenCOP`; el resto del texto queda
+ * igual. El "+" de los ingresos se omite, como en `AmountText`.
+ */
+export function speakMoney(text: string): string {
+  return text.replace(FORMATTED_COP, (_match, sign: string, digits: string) => {
+    const abs = Number.parseInt(digits.replace(/\./g, ''), 10);
+    return spokenCOP(sign === MINUS_SIGN ? -abs : abs);
+  });
+}

@@ -86,15 +86,29 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
     const source: TransactionSource = shortcut ? 'shortcut' : 'manual';
     const label = shortcut?.label ?? category?.name ?? null;
     const now = new Date();
-    const row = addExpense(db, {
-      amount,
-      categoryId,
-      note,
-      occurredAt: occurredAtFor(dayOption, now),
-      source,
-    });
+    let row: ReturnType<typeof addExpense>;
+    try {
+      row = addExpense(db, {
+        amount,
+        categoryId,
+        note,
+        occurredAt: occurredAtFor(dayOption, now),
+        source,
+      });
+    } catch {
+      // El sheet sigue abierto con lo escrito para reintentar.
+      haptics.reject();
+      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      return;
+    }
     // Alerta suave del presupuesto: va en el mismo snackbar, sin diálogos.
-    const hit = checkBudgetAlert(db, categoryId, row.occurredAt, now);
+    // Si falla, el gasto ya quedó guardado: se confirma sin la alerta.
+    let hit: ReturnType<typeof checkBudgetAlert> = null;
+    try {
+      hit = checkBudgetAlert(db, categoryId, row.occurredAt, now);
+    } catch {
+      hit = null;
+    }
     haptics.confirm();
     onClose();
     const saved = savedMessage(label, formatCOP(amount));
@@ -121,6 +135,7 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
           amount={amount}
           size="hero"
           tone={amount === 0 ? 'inkMuted' : 'ink'}
+          accessibilityLiveRegion="polite"
           testID="quick-add-amount"
         />
       </View>
@@ -130,11 +145,15 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
           label={category?.name ?? 'Categoría'}
           icon={CategoryIcon}
           selected={panel === 'category'}
+          accessibilityHint={
+            panel === 'category' ? 'Cierra la lista de categorías' : 'Abre la lista de categorías'
+          }
           onPress={() => setPanel(panel === 'category' ? 'keypad' : 'category')}
         />
         <Chip
           label={DAY_OPTIONS[dayOption]!.label}
           icon={CalendarBlankIcon}
+          accessibilityHint="Cambia el día del gasto"
           onPress={() => {
             haptics.tick();
             setDayOption(nextDayOption(dayOption));
@@ -144,6 +163,9 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
           label={note.trim() ? truncate(note.trim(), 16) : 'Nota'}
           icon={NotePencilIcon}
           selected={panel === 'note'}
+          accessibilityHint={
+            panel === 'note' ? 'Cierra la nota' : 'Abre el campo para escribir una nota'
+          }
           onPress={() => setPanel(panel === 'note' ? 'keypad' : 'note')}
         />
       </View>

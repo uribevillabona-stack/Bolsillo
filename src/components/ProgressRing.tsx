@@ -18,7 +18,22 @@ import { duration, useTheme, type ColorTokens } from '@/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-export interface ProgressRingProps {
+/**
+ * Con lector de pantalla, el anillo se describe con su etiqueta. Si va dentro
+ * de una fila tocable que ya lo dice todo, `decorative` lo oculta para no
+ * crear una parada de foco repetida.
+ */
+type ProgressA11y =
+  | {
+      /** El anillo solo no dice nada a un lector de pantalla. */
+      accessibilityLabel: string;
+      decorative?: false;
+    }
+  | { decorative: true; accessibilityLabel?: undefined };
+
+export type ProgressRingProps = ProgressRingBaseProps & ProgressA11y;
+
+interface ProgressRingBaseProps {
   /** 0 a 1. Valores mayores a 1 se muestran como excedido. */
   progress: number;
   size?: number;
@@ -26,8 +41,6 @@ export interface ProgressRingProps {
   tone?: keyof Pick<ColorTokens, 'primary' | 'accent' | 'butter'>;
   /** Contenido centrado (porcentaje, ícono). */
   children?: ReactNode;
-  /** Obligatorio: el anillo no dice nada a un lector de pantalla por sí solo. */
-  accessibilityLabel: string;
 }
 
 export function ProgressRing({
@@ -37,6 +50,7 @@ export function ProgressRing({
   tone = 'primary',
   children,
   accessibilityLabel,
+  decorative = false,
 }: ProgressRingProps) {
   const { colors } = useTheme();
   const reduceMotion = useReducedMotion();
@@ -58,10 +72,14 @@ export function ProgressRing({
   return (
     <View
       style={{ width: size, height: size }}
-      accessible
-      accessibilityRole="progressbar"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityValue={{ min: 0, max: 100, now: Math.round(clamped * 100) }}>
+      {...(decorative
+        ? { accessible: false, importantForAccessibility: 'no-hide-descendants' as const }
+        : {
+            accessible: true,
+            accessibilityRole: 'progressbar' as const,
+            accessibilityLabel,
+            accessibilityValue: { min: 0, max: 100, now: Math.round(clamped * 100) },
+          })}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
         <Circle
           cx={size / 2}

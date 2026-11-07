@@ -58,8 +58,19 @@ export function TransactionSheet({ transaction: t, onClose }: TransactionSheetPr
             icon={TrashIcon}
             block
             onPress={() => {
-              const removed = deleteTransaction(db, t.id);
-              if (removed) reconcileBudgetAlerts(db, removed.categoryId, new Date());
+              let removed: ReturnType<typeof deleteTransaction>;
+              try {
+                removed = deleteTransaction(db, t.id);
+              } catch {
+                haptics.reject();
+                showSnackbar('No se pudo eliminar. Intenta de nuevo.');
+                return;
+              }
+              try {
+                if (removed) reconcileBudgetAlerts(db, removed.categoryId, new Date());
+              } catch {
+                // Las alertas son secundarias: el movimiento ya quedó eliminado.
+              }
               haptics.confirm();
               onClose();
               if (removed) {

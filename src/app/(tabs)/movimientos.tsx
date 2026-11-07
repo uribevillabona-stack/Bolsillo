@@ -106,7 +106,7 @@ function AllMovements() {
         groups.map((g) => (
           <View key={g.key} style={styles.group}>
             <View style={styles.groupHeader}>
-              <Text variant="overline" tone="inkMuted">
+              <Text variant="overline" tone="inkMuted" accessibilityRole="header">
                 {g.label}
               </Text>
               {g.spent > 0 ? <AmountText amount={-g.spent} size="small" tone="inkMuted" /> : null}

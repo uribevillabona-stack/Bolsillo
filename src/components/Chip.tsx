@@ -19,6 +19,8 @@ export interface ChipProps {
   /** Monto predeterminado, para los atajos de gasto. */
   amount?: number;
   testID?: string;
+  /** Qué pasa al tocarlo, si no es obvio por la etiqueta. */
+  accessibilityHint?: string;
   /**
    * Rol para el lector de pantalla. Dentro de un grupo de opciones excluyentes
    * usar 'radio'; como filtro de vistas, 'tab'.
@@ -33,6 +35,7 @@ export function Chip({
   icon: IconComponent,
   amount,
   testID,
+  accessibilityHint,
   role = 'button',
 }: ChipProps) {
   const { colors } = useTheme();
@@ -46,7 +49,10 @@ export function Chip({
       disabled={!onPress}
       accessibilityRole={role}
       accessibilityLabel={a11yLabel}
+      accessibilityHint={accessibilityHint}
       accessibilityState={role === 'radio' ? { checked: selected } : { selected }}
+      // El chip mide 44 dp; con 2 dp arriba y abajo el área táctil llega a 48 dp.
+      hitSlop={{ top: 2, bottom: 2 }}
       style={[
         styles.chip,
         {

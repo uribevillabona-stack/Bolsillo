@@ -27,6 +27,8 @@ se aprobaron. Se actualiza al cerrar cada fase.
 | 2026-11-06 | Aprende: ninguna lección se bloquea. Según los datos cambia cuál se sugiere y por qué (hormigas +30 % frente al mismo tramo del mes pasado, tope apretado, respuestas del diagnóstico, sin Apartados).                          |
 | 2026-11-06 | Racha semanal: una semana cuenta si se termina una lección o se anotan gastos 3 días distintos; la semana en curso no rompe la racha hasta que termina. Sin puntos ni medallas.                                                 |
 | 2026-11-06 | Lecciones (5): gastos hormiga, 50/30/20, fondo de emergencia, tarjeta de crédito, estafas por transferencia. El contenido se valida con zod en las pruebas.                                                                     |
+| 2026-11-07 | El APK de release trae solo `armeabi-v7a` y `arm64-v8a` (`plugins/with-architectures.js`): de ~110 MB a ~55 MB. Se conserva la de 32 bits por los celulares baratos (Android Go).                                               |
+| 2026-11-07 | Pantalla de error (`RouteError`) como `ErrorBoundary` del layout raíz: "Reintentar" vuelve a montar la navegación y regresa a Inicio.                                                                                           |
 
 ## Fases
 
@@ -37,7 +39,7 @@ se aprobaron. Se actualiza al cerrar cada fase.
 | 3. Detección (aplazada) | Módulo Kotlin `NotificationListenerService` + cola nativa, parsers por banco con pruebas, deduplicación, bandeja de pendientes, aprendizaje comercio → categoría, intent de compartir, `docs/deteccion.md` | Pendiente |
 | 4. Plan e Inicio        | Presupuesto por categoría con alerta al 80 %, Apartados, dashboard, motor de recomendaciones                                                                                                               | Hecha     |
 | 5. Aprende              | 5 lecciones en JSON + quiz, recomendación por comportamiento, racha semanal                                                                                                                                | Hecha     |
-| 6. Pulido               | Modo oscuro completo, TalkBack, estados vacíos y de error, APK firmado con clave propia                                                                                                                    | Pendiente |
+| 6. Pulido               | Modo oscuro completo, TalkBack, estados vacíos y de error, APK firmado con clave propia                                                                                                                    | Hecha     |
 
 ## Pantallas
 

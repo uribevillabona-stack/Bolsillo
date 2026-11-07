@@ -24,6 +24,7 @@ import { setThemePreference } from '@/features/profile/preferences';
 import { updateProfile } from '@/features/profile/profile-repo';
 import { AmountSheet } from '@/features/shared/AmountSheet';
 import { BackHeader } from '@/features/shared/BackHeader';
+import { haptics } from '@/lib/haptics';
 import { formatCOP } from '@/lib/money';
 import { hairline, space, useTheme, useThemeStore, type ThemePreference } from '@/theme';
 
@@ -52,7 +53,13 @@ export default function AjustesScreen() {
           onChangeText={setName}
           onEndEditing={() => {
             const trimmed = name.trim();
-            if (trimmed && trimmed !== profile?.name) updateProfile(db, { name: trimmed });
+            if (!trimmed || trimmed === profile?.name) return;
+            try {
+              updateProfile(db, { name: trimmed });
+            } catch {
+              haptics.reject();
+              showSnackbar('No se pudo guardar. Intenta de nuevo.');
+            }
           }}
           maxLength={40}
           autoCapitalize="words"
@@ -126,7 +133,13 @@ export default function AjustesScreen() {
         initialAmount={profile?.monthlyIncomeEstimate ?? 0}
         onClose={() => setIncomeOpen(false)}
         onConfirm={(amount) => {
-          updateProfile(db, { monthlyIncomeEstimate: amount });
+          try {
+            updateProfile(db, { monthlyIncomeEstimate: amount });
+          } catch {
+            haptics.reject();
+            showSnackbar('No se pudo guardar. Intenta de nuevo.');
+            return;
+          }
           setIncomeOpen(false);
           showSnackbar(`Ingreso de referencia: ${formatCOP(amount)}`);
         }}
@@ -139,7 +152,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   const { colors } = useTheme();
   return (
     <View style={[styles.section, { borderTopColor: colors.line }]}>
-      <Text variant="overline" tone="inkMuted">
+      <Text variant="overline" tone="inkMuted" accessibilityRole="header">
         {title}
       </Text>
       {children}

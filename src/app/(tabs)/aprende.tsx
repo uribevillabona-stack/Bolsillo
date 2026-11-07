@@ -97,7 +97,7 @@ export default function AprendeScreen() {
       {/* Sugerida */}
       {next ? (
         <View style={[styles.section, { borderTopColor: colors.lineStrong }]}>
-          <Text variant="overline" tone="inkMuted">
+          <Text variant="overline" tone="inkMuted" accessibilityRole="header">
             Para ti ahora
           </Text>
           <Text variant="title">{next.lesson.title}</Text>
@@ -119,7 +119,9 @@ export default function AprendeScreen() {
         </View>
       ) : (
         <View style={[styles.section, { borderTopColor: colors.lineStrong }]}>
-          <Text variant="title">Terminaste todas las lecciones.</Text>
+          <Text variant="title" accessibilityRole="header">
+            Terminaste todas las lecciones.
+          </Text>
           <Text variant="body" tone="inkMuted">
             Repasar también cuenta para tu racha. Pronto llegan más.
           </Text>
@@ -128,7 +130,7 @@ export default function AprendeScreen() {
 
       {/* Todas */}
       <View style={[styles.section, { borderTopColor: colors.lineStrong }]}>
-        <Text variant="overline" tone="inkMuted">
+        <Text variant="overline" tone="inkMuted" accessibilityRole="header">
           Todas las lecciones
         </Text>
         <View>

@@ -82,7 +82,13 @@ export function BudgetSheet({
 
   const save = () => {
     if (categoryId === null || amount === 0) return;
-    setBudget(db, categoryId, amount, new Date());
+    try {
+      setBudget(db, categoryId, amount, new Date());
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      return;
+    }
     haptics.confirm();
     onClose();
     showSnackbar(
@@ -94,7 +100,14 @@ export function BudgetSheet({
 
   const remove = () => {
     if (!editing) return;
-    const removed = removeBudget(db, editing.categoryId);
+    let removed: ReturnType<typeof removeBudget>;
+    try {
+      removed = removeBudget(db, editing.categoryId);
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo quitar el tope. Intenta de nuevo.');
+      return;
+    }
     haptics.confirm();
     onClose();
     if (removed) {
@@ -138,7 +151,12 @@ export function BudgetSheet({
           <Text variant="caption" tone="inkMuted" style={styles.hint}>
             {hintFor(lastMonth, thisMonth)}
           </Text>
-          <AmountText amount={amount} size="hero" tone={amount === 0 ? 'inkMuted' : 'ink'} />
+          <AmountText
+            amount={amount}
+            size="hero"
+            tone={amount === 0 ? 'inkMuted' : 'ink'}
+            accessibilityLiveRegion="polite"
+          />
           <Text variant="caption" tone="inkMuted">
             al mes · te avisamos al 80 %
           </Text>

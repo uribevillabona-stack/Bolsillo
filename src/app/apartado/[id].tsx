@@ -160,7 +160,7 @@ export default function ApartadoScreen() {
       </View>
 
       <View style={[styles.section, { borderTopColor: colors.lineStrong }]}>
-        <Text variant="overline" tone="inkMuted">
+        <Text variant="overline" tone="inkMuted" accessibilityRole="header">
           Movimientos
         </Text>
         {history.length === 0 ? (
@@ -175,7 +175,8 @@ export default function ApartadoScreen() {
               title={c.amount > 0 ? 'Aporte' : 'Retiro'}
               subtitle={dayLabel(new Date(c.createdAt), now)}
               icon={c.amount > 0 ? ArrowDownIcon : ArrowUpIcon}
-              trailing={<AmountText amount={c.amount} size="small" signed />}
+              amount={c.amount}
+              signed
               divider={i < history.length - 1}
             />
           ))

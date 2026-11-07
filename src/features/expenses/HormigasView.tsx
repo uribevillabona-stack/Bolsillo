@@ -53,7 +53,7 @@ export function HormigasView() {
         </View>
       ) : null}
 
-      <Text variant="overline" tone="inkMuted" style={styles.listTitle}>
+      <Text variant="overline" tone="inkMuted" style={styles.listTitle} accessibilityRole="header">
         Por tipo
       </Text>
       {summary.categories.map((c, i) => (

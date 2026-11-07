@@ -57,6 +57,7 @@ export function AmountSheet({
         amount={amount}
         size="hero"
         tone={tooMuch ? 'accentText' : amount === 0 ? 'inkMuted' : 'ink'}
+        accessibilityLiveRegion="polite"
       />
       {tooMuch && maxMessage ? (
         <Text variant="caption" tone="accentText" accessibilityLiveRegion="polite">

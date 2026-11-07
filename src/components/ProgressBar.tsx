@@ -16,12 +16,25 @@ import Animated, {
 
 import { duration, useTheme, type ColorTokens } from '@/theme';
 
-export interface ProgressBarProps {
+/**
+ * Con lector de pantalla, la barra se describe con su etiqueta. Si va dentro
+ * de una fila tocable que ya lo dice todo, `decorative` la oculta para no
+ * crear una parada de foco repetida.
+ */
+type ProgressA11y =
+  | {
+      /** La barra sola no dice nada a un lector de pantalla. */
+      accessibilityLabel: string;
+      decorative?: false;
+    }
+  | { decorative: true; accessibilityLabel?: undefined };
+
+export type ProgressBarProps = ProgressBarBaseProps & ProgressA11y;
+
+interface ProgressBarBaseProps {
   /** 0 a 1; mayor a 1 se muestra llena. */
   progress: number;
   tone?: keyof Pick<ColorTokens, 'primary' | 'accent' | 'butter'>;
-  /** Obligatorio: la barra sola no dice nada a un lector de pantalla. */
-  accessibilityLabel: string;
   height?: number;
 }
 
@@ -29,6 +42,7 @@ export function ProgressBar({
   progress,
   tone = 'primary',
   accessibilityLabel,
+  decorative = false,
   height = 6,
 }: ProgressBarProps) {
   const { colors } = useTheme();
@@ -44,10 +58,14 @@ export function ProgressBar({
 
   return (
     <View
-      accessible
-      accessibilityRole="progressbar"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityValue={{ min: 0, max: 100, now: Math.round(clamped * 100) }}
+      {...(decorative
+        ? { accessible: false, importantForAccessibility: 'no-hide-descendants' as const }
+        : {
+            accessible: true,
+            accessibilityRole: 'progressbar' as const,
+            accessibilityLabel,
+            accessibilityValue: { min: 0, max: 100, now: Math.round(clamped * 100) },
+          })}
       style={[styles.track, { height, borderRadius: height / 2, backgroundColor: colors.line }]}>
       <Animated.View
         style={[

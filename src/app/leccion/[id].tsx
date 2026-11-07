@@ -40,7 +40,9 @@ export default function LeccionScreen() {
       <View
         style={[styles.root, { backgroundColor: colors.bg, paddingTop: insets.top + space[6] }]}>
         <View style={styles.gutter}>
-          <Text variant="title">Esta lección no existe.</Text>
+          <Text variant="title" accessibilityRole="header">
+            Esta lección no existe.
+          </Text>
           <Button label="Volver" variant="outline" onPress={() => router.back()} />
         </View>
       </View>

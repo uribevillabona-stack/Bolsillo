@@ -8,6 +8,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { speakMoney, spokenCOP } from '@/lib/money';
 import { hairline, minTouchTarget, space, useTheme } from '@/theme';
 
 import { AmountText } from './AmountText';
@@ -21,6 +22,8 @@ export interface ListRowProps {
   icon?: Icon;
   /** Monto a la derecha (entero COP). Negativo = egreso. */
   amount?: number;
+  /** Muestra `+` en montos positivos (ingresos, aportes). */
+  signed?: boolean;
   /** Texto a la derecha, si no hay monto. */
   value?: string;
   /** Contenido libre a la derecha (switch, insignia). */
@@ -37,6 +40,7 @@ export function ListRow({
   subtitle,
   icon: IconComponent,
   amount,
+  signed = false,
   value,
   trailing,
   onPress,
@@ -67,7 +71,7 @@ export function ListRow({
           </Text>
         ) : null}
       </View>
-      {amount !== undefined ? <AmountText amount={amount} size="small" /> : null}
+      {amount !== undefined ? <AmountText amount={amount} size="small" signed={signed} /> : null}
       {value !== undefined ? (
         <Text variant="label" tone="inkMuted">
           {value}
@@ -79,11 +83,13 @@ export function ListRow({
   );
 
   if (!onPress) {
+    // Al agrupar la fila, TalkBack solo oye esta etiqueta: debe incluir el monto y el valor.
+    const label = [title, subtitle, amount !== undefined ? spokenCOP(amount) : undefined, value]
+      .filter((part): part is string => Boolean(part))
+      .map(speakMoney)
+      .join(', ');
     return (
-      <View
-        testID={testID}
-        accessible
-        accessibilityLabel={[title, subtitle].filter(Boolean).join(', ')}>
+      <View testID={testID} accessible accessibilityLabel={label}>
         {body}
       </View>
     );

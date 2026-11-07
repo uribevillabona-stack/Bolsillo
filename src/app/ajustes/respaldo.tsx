@@ -34,14 +34,24 @@ export default function RespaldoScreen() {
   const { colors } = useTheme();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState<Backup | null>(null);
+  const [pending, setPendingState] = useState<Backup | null>(null);
+  // true si no se pudo copiar lo que hay ahora: restaurar ya no se puede deshacer
+  // y el sheet lo advierte antes de un segundo toque en "Restaurar".
+  const [noUndo, setNoUndo] = useState(false);
+  const setPending = (backup: Backup | null) => {
+    setPendingState(backup);
+    setNoUndo(false);
+  };
 
   const onExport = async () => {
     setBusy(true);
     setError(null);
     try {
       const count = await exportBackup(db);
-      showSnackbar(`Respaldo listo: ${count} ${count === 1 ? 'movimiento' : 'movimientos'}`);
+      // El menú Compartir no avisa si se descartó: el texto no promete que ya quedó guardado.
+      showSnackbar(
+        `Respaldo creado con ${count} ${count === 1 ? 'movimiento' : 'movimientos'}: guárdalo en tu Drive o en WhatsApp.`,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo crear el respaldo.');
     } finally {
@@ -51,7 +61,14 @@ export default function RespaldoScreen() {
 
   const onPick = async () => {
     setError(null);
-    const result = await pickBackup();
+    let result: Awaited<ReturnType<typeof pickBackup>>;
+    try {
+      result = await pickBackup();
+    } catch (e) {
+      haptics.reject();
+      setError(e instanceof Error ? e.message : 'No se pudo abrir el archivo.');
+      return;
+    }
     if (result.status === 'canceled') return;
     if (result.status === 'invalid') {
       haptics.reject();
@@ -63,7 +80,19 @@ export default function RespaldoScreen() {
 
   const onRestore = () => {
     if (!pending) return;
-    const snapshot = buildBackup(collectBackupData(db), new Date());
+    // Copia para "Deshacer". Si los datos actuales no se pueden leer, no se
+    // restaura en este toque: el sheet avisa que no habrá "Deshacer" y un
+    // segundo toque restaura igual (es justo cuando más sirve un respaldo).
+    let snapshot: Backup | null = null;
+    if (!noUndo) {
+      try {
+        snapshot = buildBackup(collectBackupData(db), new Date());
+      } catch {
+        haptics.reject();
+        setNoUndo(true);
+        return;
+      }
+    }
     try {
       restoreBackup(db, pending);
       useThemeStore.getState().setPreference(pending.data.profile.themePreference);
@@ -74,6 +103,10 @@ export default function RespaldoScreen() {
     }
     setPending(null);
     haptics.success();
+    if (!snapshot) {
+      showSnackbar('Respaldo restaurado.');
+      return;
+    }
     showSnackbar('Respaldo restaurado', {
       label: 'Deshacer',
       onPress: () => {
@@ -93,7 +126,9 @@ export default function RespaldoScreen() {
       </Text>
 
       <View style={[styles.block, { borderTopColor: colors.line }]}>
-        <Text variant="title">Exportar</Text>
+        <Text variant="title" accessibilityRole="header">
+          Exportar
+        </Text>
         <Text variant="body" tone="inkMuted">
           Crea un archivo con todos tus movimientos, atajos, Apartados y ajustes.
         </Text>
@@ -106,7 +141,9 @@ export default function RespaldoScreen() {
       </View>
 
       <View style={[styles.block, { borderTopColor: colors.line }]}>
-        <Text variant="title">Restaurar</Text>
+        <Text variant="title" accessibilityRole="header">
+          Restaurar
+        </Text>
         <Text variant="body" tone="inkMuted">
           Elige un archivo de respaldo de BOLSILLO. Reemplaza todo lo que tienes ahora.
         </Text>
@@ -134,11 +171,28 @@ export default function RespaldoScreen() {
               {pending.data.transactions.length} movimientos, {pending.data.shortcuts.length} atajos
               y {pending.data.goals.length} Apartados.
             </Text>
-            <Text variant="body" style={styles.warning}>
-              Lo que tienes ahora se reemplaza. Podrás deshacerlo durante unos segundos.
-            </Text>
+            {noUndo ? (
+              <Text
+                variant="body"
+                tone="accentText"
+                style={styles.warning}
+                accessibilityLiveRegion="assertive">
+                No pudimos copiar lo que tienes ahora. Si restauras, se reemplaza y no se podrá
+                deshacer.
+              </Text>
+            ) : (
+              <Text variant="body" style={styles.warning}>
+                Lo que tienes ahora se reemplaza. Podrás deshacerlo durante unos segundos.
+              </Text>
+            )}
             <View style={styles.actions}>
-              <Button label="Restaurar" variant="accent" size="lg" block onPress={onRestore} />
+              <Button
+                label={noUndo ? 'Restaurar sin deshacer' : 'Restaurar'}
+                variant="accent"
+                size="lg"
+                block
+                onPress={onRestore}
+              />
               <Button label="Cancelar" variant="quiet" block onPress={() => setPending(null)} />
             </View>
           </>

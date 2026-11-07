@@ -9,6 +9,7 @@ import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { haptics } from '@/lib/haptics';
+import { speakMoney } from '@/lib/money';
 import { minTouchTarget, radius, screenGutter, space, useTheme } from '@/theme';
 
 import { PressableScale } from './PressableScale';
@@ -35,8 +36,9 @@ export function Snackbar({ bottomOffset = 0 }: SnackbarProps) {
     if (!current) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let active = true;
+    const spoken = speakMoney(current.text);
     AccessibilityInfo.announceForAccessibility(
-      current.action ? `${current.text}. ${current.action.label} disponible.` : current.text,
+      current.action ? `${spoken}. ${current.action.label} disponible.` : spoken,
     );
     // Con lector de pantalla, 5 s no alcanzan para llegar al botón (WCAG 2.2.1).
     AccessibilityInfo.isScreenReaderEnabled().then((reader) => {

@@ -8,7 +8,7 @@
 import { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, ShieldCheckIcon, Text } from '@/components';
+import { Button, ShieldCheckIcon, showSnackbar, Text } from '@/components';
 import { db } from '@/db/client';
 import { OnboardingStep } from '@/features/onboarding/OnboardingStep';
 import { completeOnboarding, useOnboardingStore } from '@/features/onboarding/onboarding-store';
@@ -33,7 +33,15 @@ export default function DeteccionStep() {
     if (finishing.current) return;
     finishing.current = true;
     const draft = useOnboardingStore.getState();
-    completeOnboarding(db, draft, consent);
+    try {
+      completeOnboarding(db, draft, consent);
+    } catch {
+      // Se libera el candado para que pueda reintentar.
+      finishing.current = false;
+      haptics.reject();
+      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      return;
+    }
     haptics.success();
     useOnboardingStore.getState().reset();
     // El layout raíz cambia de grupo solo (Stack.Protected) al ver onboardingDone.

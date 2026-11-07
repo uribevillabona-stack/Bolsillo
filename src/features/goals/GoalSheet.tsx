@@ -101,8 +101,14 @@ export function GoalSheet({ target, onClose, onDeleted }: GoalSheetProps) {
       haptics.reject();
       return;
     }
-    if (editing) updateGoal(db, editing.id, input);
-    else createGoal(db, input);
+    try {
+      if (editing) updateGoal(db, editing.id, input);
+      else createGoal(db, input);
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      return;
+    }
     haptics.confirm();
     onClose();
     showSnackbar(editing ? 'Apartado actualizado' : `Apartado "${name.trim()}" creado`);
@@ -110,7 +116,14 @@ export function GoalSheet({ target, onClose, onDeleted }: GoalSheetProps) {
 
   const remove = () => {
     if (!editing) return;
-    const deleted = deleteGoal(db, editing.id);
+    let deleted: ReturnType<typeof deleteGoal>;
+    try {
+      deleted = deleteGoal(db, editing.id);
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo eliminar. Intenta de nuevo.');
+      return;
+    }
     haptics.confirm();
     onClose();
     onDeleted?.();

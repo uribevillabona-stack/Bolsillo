@@ -68,8 +68,14 @@ export function ShortcutSheet({ target, onClose }: ShortcutSheetProps) {
       haptics.reject();
       return;
     }
-    if (editing) updateShortcut(db, editing.id, input);
-    else createShortcut(db, input);
+    try {
+      if (editing) updateShortcut(db, editing.id, input);
+      else createShortcut(db, input);
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      return;
+    }
     haptics.confirm();
     onClose();
     showSnackbar(editing ? 'Atajo actualizado' : `Atajo "${label.trim()}" creado`);
@@ -77,7 +83,14 @@ export function ShortcutSheet({ target, onClose }: ShortcutSheetProps) {
 
   const remove = () => {
     if (!editing) return;
-    const removed = deleteShortcut(db, editing.id);
+    let removed: ReturnType<typeof deleteShortcut>;
+    try {
+      removed = deleteShortcut(db, editing.id);
+    } catch {
+      haptics.reject();
+      showSnackbar('No se pudo eliminar. Intenta de nuevo.');
+      return;
+    }
     haptics.confirm();
     onClose();
     if (removed) {

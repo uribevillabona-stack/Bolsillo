@@ -8,6 +8,7 @@
  * datos locales, un error de migración es la peor falla posible y debe verse.
  */
 import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
+import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
@@ -60,6 +61,13 @@ export function DatabaseGate({ children }: { children: ReactNode }) {
 
 function BootError({ error }: { error: Error }) {
   const { colors } = useTheme();
+
+  // Sin base de datos AppNavigator nunca se monta y no oculta el splash: se
+  // oculta aquí para que el error se vea.
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.bg }}
@@ -67,8 +75,8 @@ function BootError({ error }: { error: Error }) {
       accessibilityRole="alert">
       <Text variant="title">No pudimos abrir tus datos.</Text>
       <Text variant="body" tone="inkMuted">
-        Tus datos siguen guardados en el teléfono. Cierra la app y vuelve a abrirla; si el problema
-        sigue, restaura un respaldo desde Ajustes.
+        Tus datos siguen guardados en el teléfono. Cierra la app por completo y vuelve a abrirla; si
+        el problema sigue, reinicia el teléfono e inténtalo otra vez.
       </Text>
       <Text variant="mono" tone="inkMuted" selectable>
         {error.message}

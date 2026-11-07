@@ -121,7 +121,7 @@ export default function PlanScreen() {
                 onPress={() => router.push(`/apartado/${goal.id}` as Href)}
                 scaleTo={0.99}
                 accessibilityRole="button"
-                accessibilityLabel={`${goal.name}. ${spokenCOP(progress.saved)} de ${spokenCOP(goal.targetAmount)}.`}
+                accessibilityLabel={`${goal.name}. ${spokenCOP(progress.saved)} de ${spokenCOP(goal.targetAmount)}. ${paceSentence(goal, progress, now, spokenCOP)}`}
                 accessibilityHint="Abre el Apartado para aportar o retirar"
                 style={[
                   styles.goalRow,
@@ -135,7 +135,7 @@ export default function PlanScreen() {
                   size={56}
                   strokeWidth={5}
                   tone={progress.completed ? 'butter' : 'primary'}
-                  accessibilityLabel={`${Math.floor(progress.ratio * 100)} % de ${goal.name}`}>
+                  decorative>
                   {progress.completed ? (
                     <PiggyBankIcon size={22} color={colors.ink} />
                   ) : (
@@ -221,11 +221,7 @@ function BudgetRow({
           / {formatCOP(line.limitAmount)}
         </Text>
       </View>
-      <ProgressBar
-        progress={line.ratio}
-        tone={alert ? 'accent' : 'primary'}
-        accessibilityLabel={`Presupuesto de ${line.categoryName}`}
-      />
+      <ProgressBar progress={line.ratio} tone={alert ? 'accent' : 'primary'} decorative />
       <Text variant="caption" tone={alert ? 'accentText' : 'inkMuted'}>
         {status(formatCOP)}
       </Text>
