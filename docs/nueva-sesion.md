@@ -63,6 +63,8 @@ Pega esto al empezar:
 
 1. Fase 3 (detección de notificaciones), cuando lleguen los ejemplos reales de los bancos.
 2. Opcional antes de la sustentación: una pasada con TalkBack encendido de verdad.
+3. Fase 7 (iOS): plan en `docs/plan.md` → "Fase 7: iOS". No hay iPhone ni Mac todavía: empezar por
+   la compatibilidad en el código (paso 1 del plan).
 
 APK final (2026-11-07, commit `6e6c6f6`): compilado, firmado con la clave propia y probado por
 el equipo en otro celular sin development build: funciona. Copia en `C:devBOLSILLO-0.1.0.apk`.

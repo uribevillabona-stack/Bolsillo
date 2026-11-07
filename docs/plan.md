@@ -5,30 +5,31 @@ se aprobaron. Se actualiza al cerrar cada fase.
 
 ## Decisiones aprobadas
 
-| Fecha      | Decisión                                                                                                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-05 | Proyecto en `C:\dev\bolsillo` (fuera de OneDrive). Repo: `github.com/uribevillabona-stack/Bolsillo`.                                                                                                                            |
-| 2026-11-05 | Pestañas: Inicio · Movimientos · Aprende · Plan. Botón flotante de registro en todas.                                                                                                                                           |
-| 2026-11-05 | `zod` para validar el JSON de respaldo al importarlo.                                                                                                                                                                           |
-| 2026-11-05 | Rutas en `src/app/` (convención de Expo SDK 58) en lugar de `app/` en la raíz: todo el código queda bajo `src/`.                                                                                                                |
-| 2026-11-05 | El onboarding se construye en la Fase 2, junto con la base de datos (necesita la tabla `profile`).                                                                                                                              |
-| 2026-11-05 | Sin `expo-document-picker`: `expo-file-system` (SDK 58) ya trae `File.pickFileAsync()`. Una dependencia menos.                                                                                                                  |
-| 2026-11-05 | Las tablas de fases futuras (pendientes, reglas de comercio, presupuestos, lecciones) llegan como migraciones nuevas en su fase, no en la inicial: así se ve cómo evoluciona el esquema.                                        |
-| 2026-11-05 | Proyección anual de hormigas con ventana móvil de 7 a 30 días según la historia del usuario (ver `hormigas-stats.ts`).                                                                                                          |
-| 2026-11-05 | Importar un respaldo es la única acción con confirmación explícita (reemplaza todo); además se puede deshacer. El resto usa "deshacer" sin diálogos.                                                                            |
-| 2026-11-06 | La Fase 3 (detección) se aplaza hasta tener ejemplos reales de notificaciones; se avanza con las fases 4, 5 y 6, que no dependen de ellos.                                                                                      |
-| 2026-11-06 | Topes de presupuesto: uno por categoría que se repite cada mes (tabla `budgets` sin columna de mes). Las alertas del 80 % y 100 % se guardan por mes en `budget_alerts` para avisar una sola vez.                               |
-| 2026-11-06 | La alerta del presupuesto va dentro del snackbar de "guardado" (con marca coral), sin diálogos: informa, no bloquea.                                                                                                            |
-| 2026-11-06 | Lo separado en Apartados sale del disponible del mes; un retiro lo devuelve. Un retiro nunca deja un Apartado en negativo. Un aporte marcado "Ya la tenía ahorrada" (`from_savings`) cuenta para la meta pero no resta del mes. |
-| 2026-11-06 | Cuota mensual de un Apartado = lo que faltaba al empezar el mes ÷ meses que quedan (contando el actual): aportar a mitad de mes no baja la cuota de ese mes.                                                                    |
-| 2026-11-06 | Recomendaciones: motor de reglas locales ordenadas por prioridad; "Ahora no" la oculta 3 días (`recommendation_dismissals`).                                                                                                    |
-| 2026-11-06 | Montos con espacio de no separación (U+00A0) entre `$` y el número: nunca quedan en líneas distintas.                                                                                                                           |
-| 2026-11-06 | Respaldo v2: incluye los topes, los aportes "ya la tenía ahorrada" y las lecciones terminadas. Un respaldo v1 se sigue leyendo.                                                                                                 |
-| 2026-11-06 | Aprende: ninguna lección se bloquea. Según los datos cambia cuál se sugiere y por qué (hormigas +30 % frente al mismo tramo del mes pasado, tope apretado, respuestas del diagnóstico, sin Apartados).                          |
-| 2026-11-06 | Racha semanal: una semana cuenta si se termina una lección o se anotan gastos 3 días distintos; la semana en curso no rompe la racha hasta que termina. Sin puntos ni medallas.                                                 |
-| 2026-11-06 | Lecciones (5): gastos hormiga, 50/30/20, fondo de emergencia, tarjeta de crédito, estafas por transferencia. El contenido se valida con zod en las pruebas.                                                                     |
-| 2026-11-07 | El APK de release trae solo `armeabi-v7a` y `arm64-v8a` (`plugins/with-architectures.js`): de ~110 MB a ~55 MB. Se conserva la de 32 bits por los celulares baratos (Android Go).                                               |
-| 2026-11-07 | Pantalla de error (`RouteError`) como `ErrorBoundary` del layout raíz: "Reintentar" vuelve a montar la navegación y regresa a Inicio.                                                                                           |
+| Fecha      | Decisión                                                                                                                                                                                                                                                  |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-05 | Proyecto en `C:\dev\bolsillo` (fuera de OneDrive). Repo: `github.com/uribevillabona-stack/Bolsillo`.                                                                                                                                                      |
+| 2026-11-05 | Pestañas: Inicio · Movimientos · Aprende · Plan. Botón flotante de registro en todas.                                                                                                                                                                     |
+| 2026-11-05 | `zod` para validar el JSON de respaldo al importarlo.                                                                                                                                                                                                     |
+| 2026-11-05 | Rutas en `src/app/` (convención de Expo SDK 58) en lugar de `app/` en la raíz: todo el código queda bajo `src/`.                                                                                                                                          |
+| 2026-11-05 | El onboarding se construye en la Fase 2, junto con la base de datos (necesita la tabla `profile`).                                                                                                                                                        |
+| 2026-11-05 | Sin `expo-document-picker`: `expo-file-system` (SDK 58) ya trae `File.pickFileAsync()`. Una dependencia menos.                                                                                                                                            |
+| 2026-11-05 | Las tablas de fases futuras (pendientes, reglas de comercio, presupuestos, lecciones) llegan como migraciones nuevas en su fase, no en la inicial: así se ve cómo evoluciona el esquema.                                                                  |
+| 2026-11-05 | Proyección anual de hormigas con ventana móvil de 7 a 30 días según la historia del usuario (ver `hormigas-stats.ts`).                                                                                                                                    |
+| 2026-11-05 | Importar un respaldo es la única acción con confirmación explícita (reemplaza todo); además se puede deshacer. El resto usa "deshacer" sin diálogos.                                                                                                      |
+| 2026-11-06 | La Fase 3 (detección) se aplaza hasta tener ejemplos reales de notificaciones; se avanza con las fases 4, 5 y 6, que no dependen de ellos.                                                                                                                |
+| 2026-11-06 | Topes de presupuesto: uno por categoría que se repite cada mes (tabla `budgets` sin columna de mes). Las alertas del 80 % y 100 % se guardan por mes en `budget_alerts` para avisar una sola vez.                                                         |
+| 2026-11-06 | La alerta del presupuesto va dentro del snackbar de "guardado" (con marca coral), sin diálogos: informa, no bloquea.                                                                                                                                      |
+| 2026-11-06 | Lo separado en Apartados sale del disponible del mes; un retiro lo devuelve. Un retiro nunca deja un Apartado en negativo. Un aporte marcado "Ya la tenía ahorrada" (`from_savings`) cuenta para la meta pero no resta del mes.                           |
+| 2026-11-06 | Cuota mensual de un Apartado = lo que faltaba al empezar el mes ÷ meses que quedan (contando el actual): aportar a mitad de mes no baja la cuota de ese mes.                                                                                              |
+| 2026-11-06 | Recomendaciones: motor de reglas locales ordenadas por prioridad; "Ahora no" la oculta 3 días (`recommendation_dismissals`).                                                                                                                              |
+| 2026-11-06 | Montos con espacio de no separación (U+00A0) entre `$` y el número: nunca quedan en líneas distintas.                                                                                                                                                     |
+| 2026-11-06 | Respaldo v2: incluye los topes, los aportes "ya la tenía ahorrada" y las lecciones terminadas. Un respaldo v1 se sigue leyendo.                                                                                                                           |
+| 2026-11-06 | Aprende: ninguna lección se bloquea. Según los datos cambia cuál se sugiere y por qué (hormigas +30 % frente al mismo tramo del mes pasado, tope apretado, respuestas del diagnóstico, sin Apartados).                                                    |
+| 2026-11-06 | Racha semanal: una semana cuenta si se termina una lección o se anotan gastos 3 días distintos; la semana en curso no rompe la racha hasta que termina. Sin puntos ni medallas.                                                                           |
+| 2026-11-06 | Lecciones (5): gastos hormiga, 50/30/20, fondo de emergencia, tarjeta de crédito, estafas por transferencia. El contenido se valida con zod en las pruebas.                                                                                               |
+| 2026-11-07 | El APK de release trae solo `armeabi-v7a` y `arm64-v8a` (`plugins/with-architectures.js`): de ~110 MB a ~55 MB. Se conserva la de 32 bits por los celulares baratos (Android Go).                                                                         |
+| 2026-11-07 | Pantalla de error (`RouteError`) como `ErrorBoundary` del layout raíz: "Reintentar" vuelve a montar la navegación y regresa a Inicio.                                                                                                                     |
+| 2026-11-07 | iOS sale del mismo código (Expo). Sin iPhone ni Mac por ahora: se adelanta la compatibilidad en el código y la prueba en dispositivo espera. La distribución en iOS (Expo Go, Mac prestado o Apple Developer de USD 99/año) se decide cuando haya equipo. |
 
 ## Fases
 
@@ -40,6 +41,38 @@ se aprobaron. Se actualiza al cerrar cada fase.
 | 4. Plan e Inicio        | Presupuesto por categoría con alerta al 80 %, Apartados, dashboard, motor de recomendaciones                                                                                                               | Hecha     |
 | 5. Aprende              | 5 lecciones en JSON + quiz, recomendación por comportamiento, racha semanal                                                                                                                                | Hecha     |
 | 6. Pulido               | Modo oscuro completo, TalkBack, estados vacíos y de error, APK firmado con clave propia                                                                                                                    | Hecha     |
+| 7. iOS (planeada)       | Compatibilidad en el código (VoiceOver, teclado, configuración iOS), prueba en Expo Go cuando haya iPhone, distribución según la sección "Fase 7"                                                          | Pendiente |
+
+## Fase 7: iOS (plan)
+
+El código ya es multiplataforma: ningún `Platform.OS`, todas las dependencias funcionan en iOS y
+los config plugins (`with-cmake-version`, `with-release-signing`, `with-architectures`) solo tocan
+Android. Lo que falta:
+
+1. **Compatibilidad en el código (se puede hacer ya, sin iPhone):**
+   - VoiceOver: `accessibilityLiveRegion` e `importantForAccessibility` son solo de Android
+     (11 archivos). Equivalentes en iOS: `AccessibilityInfo.announceForAccessibility` para los
+     anuncios (monto del teclado, errores) y `accessibilityElementsHidden` para lo decorativo
+     (`ProgressRing`/`ProgressBar` con `decorative`).
+   - `Sheet`: el ajuste del teclado está pensado para el Modal de Android; en iOS usar
+     `keyboardWillShow`/`keyboardWillHide` y revisar que el arrastre no choque con el gesto de
+     volver.
+   - `app.json`: ícono de 1024 px sin transparencia, splash, `ITSAppUsesNonExemptEncryption: false`.
+     Comprobar `npx expo prebuild --platform ios --no-install` desde Windows.
+2. **Prueba en un iPhone (cuando haya uno):** Expo Go con `npx expo start --tunnel`. Antes,
+   confirmar que Expo Go de la App Store soporta el SDK del proyecto (solo soporta el más reciente).
+   Revisar: notch y barra de inicio, teclado en los sheets, respaldo con la app Archivos y el menú
+   Compartir, modo oscuro, fuentes, vibración, VoiceOver.
+3. **Distribución (decisión pendiente):**
+
+   | Vía                          | Costo      | Necesita                      | Límite                                                 |
+   | ---------------------------- | ---------- | ----------------------------- | ------------------------------------------------------ |
+   | Expo Go                      | $0         | iPhone + PC con Metro         | No es instalable; sirve para desarrollo y sustentación |
+   | Xcode + Apple ID gratis      | $0         | Un Mac (¿laboratorio FET?)    | Caduca a los 7 días; solo iPhones conectados a ese Mac |
+   | Apple Developer + TestFlight | USD 99/año | Un Mac o EAS Build en la nube | Rompe el costo cero y la regla de `AGENTS.md`          |
+
+4. **Fase 3 en iOS:** no hay detección de notificaciones (Apple no lo permite). El registro es
+   manual; a futuro, compartir texto hacia BOLSILLO con una extensión de compartir.
 
 ## Pantallas
 
