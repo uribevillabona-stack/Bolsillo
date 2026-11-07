@@ -27,7 +27,10 @@ import {
 import { db } from '@/db/client';
 import { useCategories, useShortcuts } from '@/db/hooks';
 import type { TransactionSource } from '@/db/schema';
+import { hitMessage } from '@/features/budget/budget-logic';
+import { checkBudgetAlert, reconcileBudgetAlerts } from '@/features/budget/budget-repo';
 import { iconFor } from '@/features/categories/category-icons';
+import { daysLeftInMonth } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
 import { digitsToAmount, formatCOP } from '@/lib/money';
 import { space } from '@/theme';
@@ -82,19 +85,30 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
   const save = () => {
     const source: TransactionSource = shortcut ? 'shortcut' : 'manual';
     const label = shortcut?.label ?? category?.name ?? null;
+    const now = new Date();
     const row = addExpense(db, {
       amount,
       categoryId,
       note,
-      occurredAt: occurredAtFor(dayOption, new Date()),
+      occurredAt: occurredAtFor(dayOption, now),
       source,
     });
+    // Alerta suave del presupuesto: va en el mismo snackbar, sin diálogos.
+    const hit = checkBudgetAlert(db, categoryId, row.occurredAt, now);
     haptics.confirm();
     onClose();
-    showSnackbar(savedMessage(label, formatCOP(amount)), {
-      label: 'Deshacer',
-      onPress: () => deleteTransaction(db, row.id),
-    });
+    const saved = savedMessage(label, formatCOP(amount));
+    showSnackbar(
+      hit ? `${saved}. ${hitMessage(hit, daysLeftInMonth(now), formatCOP)}` : saved,
+      {
+        label: 'Deshacer',
+        onPress: () => {
+          deleteTransaction(db, row.id);
+          reconcileBudgetAlerts(db, row.categoryId, new Date());
+        },
+      },
+      hit ? 'alert' : 'default',
+    );
   };
 
   return (

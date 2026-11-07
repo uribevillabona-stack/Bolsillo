@@ -7,12 +7,12 @@
  * - Fechas: INTEGER con milisegundos desde epoch (Date.now()).
  * - Booleanos: INTEGER 0/1 (modo 'boolean' de Drizzle).
  *
- * Fases siguientes agregan tablas con migraciones nuevas
- * (pending_movements, merchant_rules, budgets, lesson_progress...).
+ * Cada fase agrega sus tablas con una migración nueva (0001: presupuesto y
+ * recomendaciones; Fase 3: pending_movements y merchant_rules; Fase 5: lecciones).
  * Para cambiar el esquema: editar este archivo y correr `npm run db:generate`.
  */
 import { sql } from 'drizzle-orm';
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const createdAt = () =>
   integer('created_at')
@@ -108,10 +108,55 @@ export const goalContributions = sqliteTable(
       .references(() => goals.id, { onDelete: 'cascade' }),
     amount: integer('amount').notNull(),
     note: text('note'),
+    /** "Ya la tenía ahorrada": cuenta para la meta, no resta del disponible del mes. */
+    fromSavings: integer('from_savings', { mode: 'boolean' }).notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [index('goal_contributions_goal_idx').on(t.goalId)],
 );
+
+/**
+ * Tope mensual por categoría. Uno por categoría y se repite cada mes: a los
+ * 18 años nadie rehace su presupuesto el día 1. Si cambia el tope, cambia
+ * desde el mes en curso.
+ */
+export const budgets = sqliteTable('budgets', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  categoryId: integer('category_id')
+    .notNull()
+    .unique()
+    .references(() => categories.id, { onDelete: 'cascade' }),
+  limitAmount: integer('limit_amount').notNull(),
+  createdAt: createdAt(),
+});
+
+/**
+ * Alertas de presupuesto ya mostradas (80 % y 100 %), para avisar una sola
+ * vez por mes y categoría. Se borran las del mes si el usuario cambia el tope.
+ */
+export const budgetAlerts = sqliteTable(
+  'budget_alerts',
+  {
+    /** 'YYYY-MM' */
+    month: text('month').notNull(),
+    categoryId: integer('category_id')
+      .notNull()
+      .references(() => categories.id, { onDelete: 'cascade' }),
+    /** 80 | 100 */
+    threshold: integer('threshold').notNull(),
+    shownAt: integer('shown_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.month, t.categoryId, t.threshold] })],
+);
+
+/**
+ * Recomendaciones que el usuario descartó ("Ahora no"). La clave incluye el
+ * sujeto (p. ej. 'budget-near:5'): descartar una no silencia las demás.
+ */
+export const recommendationDismissals = sqliteTable('recommendation_dismissals', {
+  ruleKey: text('rule_key').primaryKey(),
+  dismissedAt: integer('dismissed_at').notNull(),
+});
 
 export type Profile = typeof profile.$inferSelect;
 export type Category = typeof categories.$inferSelect;
@@ -122,6 +167,7 @@ export type Shortcut = typeof shortcuts.$inferSelect;
 export type NewShortcut = typeof shortcuts.$inferInsert;
 export type Goal = typeof goals.$inferSelect;
 export type GoalContribution = typeof goalContributions.$inferSelect;
+export type Budget = typeof budgets.$inferSelect;
 
 export type TransactionType = 'expense' | 'income' | 'transfer_in' | 'transfer_out';
 export type TransactionSource = 'manual' | 'shortcut' | 'detected' | 'shared';

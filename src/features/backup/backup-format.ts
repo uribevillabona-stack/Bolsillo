@@ -9,8 +9,12 @@
 import { z } from 'zod';
 
 export const BACKUP_APP_ID = 'bolsillo';
-/** Sube cuando cambie la forma de `data`. Ver `migrateBackup`. */
-export const BACKUP_SCHEMA_VERSION = 1;
+/**
+ * Sube cuando cambie la forma de `data`.
+ * v1: Fase 2. v2: + topes de presupuesto y aportes "ya la tenía ahorrada"
+ * (un respaldo v1 se lee con topes vacíos y aportes normales).
+ */
+export const BACKUP_SCHEMA_VERSION = 2;
 
 const id = z.int().positive();
 const amount = z.int();
@@ -77,6 +81,14 @@ const goalContributionSchema = z.object({
   goalId: id,
   amount,
   note: z.string().max(280).nullable(),
+  fromSavings: z.boolean().default(false),
+  createdAt: timestamp,
+});
+
+const budgetSchema = z.object({
+  id,
+  categoryId: id,
+  limitAmount: amount.positive(),
   createdAt: timestamp,
 });
 
@@ -87,16 +99,17 @@ export const backupDataSchema = z.object({
   shortcuts: z.array(shortcutSchema),
   goals: z.array(goalSchema),
   goalContributions: z.array(goalContributionSchema),
+  budgets: z.array(budgetSchema).default([]),
 });
 
 export const backupSchema = z.object({
   app: z.literal(BACKUP_APP_ID),
-  schemaVersion: z.literal(BACKUP_SCHEMA_VERSION),
+  schemaVersion: z.union([z.literal(1), z.literal(BACKUP_SCHEMA_VERSION)]),
   exportedAt: z.iso.datetime(),
   data: backupDataSchema,
 });
 
-export type BackupData = z.infer<typeof backupDataSchema>;
+export type BackupData = z.output<typeof backupDataSchema>;
 export type Backup = z.infer<typeof backupSchema>;
 
 export function buildBackup(data: BackupData, now: Date): Backup {
@@ -160,7 +173,13 @@ export function parseBackup(text: string): ParseResult {
     (s) => s.categoryId !== null && !categoryIds.has(s.categoryId),
   );
   const badContribution = data.goalContributions.find((c) => !goalIds.has(c.goalId));
-  if (badTx || badShortcut || badContribution) {
+  const budgetCats = data.budgets.map((b) => b.categoryId);
+  const budgetIds = data.budgets.map((b) => b.id);
+  const badBudget =
+    budgetCats.some((c) => !categoryIds.has(c)) ||
+    new Set(budgetCats).size !== budgetCats.length ||
+    new Set(budgetIds).size !== budgetIds.length;
+  if (badTx || badShortcut || badContribution || badBudget) {
     return {
       ok: false,
       error: 'El respaldo está incompleto: hay datos que apuntan a otros que no existen.',

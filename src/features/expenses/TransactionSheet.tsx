@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { AmountText, Button, ListRow, Sheet, showSnackbar, TrashIcon } from '@/components';
 import { db } from '@/db/client';
+import { reconcileBudgetAlerts } from '@/features/budget/budget-repo';
 import { iconFor } from '@/features/categories/category-icons';
 import { dayLabel, timeLabel } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
@@ -58,6 +59,7 @@ export function TransactionSheet({ transaction: t, onClose }: TransactionSheetPr
             block
             onPress={() => {
               const removed = deleteTransaction(db, t.id);
+              if (removed) reconcileBudgetAlerts(db, removed.categoryId, new Date());
               haptics.confirm();
               onClose();
               if (removed) {

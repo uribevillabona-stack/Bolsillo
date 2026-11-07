@@ -89,3 +89,29 @@ export function timeLabel(date: Date): string {
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return `${h12}:${m} ${h < 12 ? 'a. m.' : 'p. m.'}`;
 }
+
+/** Primer instante del mes que está `n` meses después (o antes, si n < 0) del de `date`. */
+export function addMonths(date: Date, n: number): Date {
+  return new Date(date.getFullYear(), date.getMonth() + n, 1);
+}
+
+/** Último milisegundo del mes de `date`. Así se guarda la fecha de un Apartado. */
+export function endOfMonth(date: Date): Date {
+  return new Date(startOfNextMonth(date).getTime() - 1);
+}
+
+/**
+ * Meses calendario que quedan desde el mes de `now` hasta el de `target`,
+ * contando ambos: de noviembre a enero son 3 (nov, dic, ene). 0 si ya pasó.
+ */
+export function monthsUntil(now: Date, target: Date): number {
+  const diff =
+    (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth()) + 1;
+  return Math.max(0, diff);
+}
+
+/** "marzo de 2027" (sin año si es el mismo de `now`). */
+export function monthYearLabel(date: Date, now: Date): string {
+  const name = monthName(date);
+  return date.getFullYear() === now.getFullYear() ? name : `${name} de ${date.getFullYear()}`;
+}

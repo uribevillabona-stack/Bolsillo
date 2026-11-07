@@ -1,6 +1,7 @@
 /**
  * Inicio. Solo lo esencial: saldo disponible del mes, gasto de hoy,
  * pendientes por confirmar, una recomendación y (Fase 5) la próxima lección.
+ * La recomendación sale del motor de reglas locales (features/recommendations).
  */
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
@@ -8,11 +9,9 @@ import { StyleSheet, View } from 'react-native';
 import { AmountText, GearSixIcon, Screen, Text } from '@/components';
 import { PressableScale } from '@/components/PressableScale';
 import { TAB_BAR_HEIGHT } from '@/components/TabBar';
-import { useProfile, useTransactionsBetween } from '@/db/hooks';
-import { projectionSentence } from '@/features/expenses/hormigas-stats';
-import { monthTotals } from '@/features/expenses/month-totals';
-import { useHormigaSummary } from '@/features/expenses/use-hormigas';
-import { daysLeftLabel, monthName, startOfMonth, startOfNextMonth } from '@/lib/dates';
+import { useMonthOverview } from '@/features/overview/use-month-overview';
+import { RecommendationCard } from '@/features/recommendations/RecommendationCard';
+import { daysLeftLabel, monthName } from '@/lib/dates';
 import { formatCOP } from '@/lib/money';
 import { AJUSTES_HREF } from '@/lib/routes';
 import { useNow } from '@/lib/use-now';
@@ -21,11 +20,7 @@ import { hairline, minTouchTarget, space, useTheme } from '@/theme';
 export default function InicioScreen() {
   const { colors } = useTheme();
   const now = useNow();
-  const profile = useProfile();
-  const rows = useTransactionsBetween(startOfMonth(now).getTime(), startOfNextMonth(now).getTime());
-  const totals = monthTotals(rows, now, profile?.monthlyIncomeEstimate ?? 0);
-  const hormigas = useHormigaSummary(now);
-  const topHormiga = hormigas.categories.find((c) => c.annualProjection > 0);
+  const { profile, totals, recommendation } = useMonthOverview(now);
   const firstName = profile?.name.split(' ')[0];
 
   return (
@@ -53,11 +48,11 @@ export default function InicioScreen() {
           tone={totals.available < 0 ? 'accentText' : 'ink'}
           testID="saldo-mes"
         />
-        {totals.usedIncomeEstimate ? (
-          <Text variant="caption" tone="inkMuted">
-            Con tu ingreso de referencia de {formatCOP(profile?.monthlyIncomeEstimate ?? 0)}.
+        {captionFor(totals, profile?.monthlyIncomeEstimate ?? 0).map((line) => (
+          <Text key={line} variant="caption" tone="inkMuted">
+            {line}
           </Text>
-        ) : null}
+        ))}
       </View>
 
       <View style={[styles.split, { borderColor: colors.line }]}>
@@ -75,32 +70,24 @@ export default function InicioScreen() {
         </View>
       </View>
 
-      {rows.length === 0 ? (
-        <View style={styles.block}>
-          <Text variant="title">Arranca por lo pequeño.</Text>
-          <Text variant="body" tone="inkMuted">
-            Anota tu próximo tinto con el botón +. Con una semana de datos ya te podemos decir a
-            dónde se te va la plata.
-          </Text>
-        </View>
-      ) : topHormiga ? (
-        <PressableScale
-          onPress={() => router.push('/movimientos?vista=hormigas')}
-          accessibilityRole="button"
-          accessibilityHint="Abre la vista de gastos hormiga"
-          scaleTo={0.99}
-          style={[styles.block, styles.insight, { borderColor: colors.line }]}>
-          <Text variant="overline" tone="inkMuted">
-            Gastos hormiga
-          </Text>
-          <Text variant="title">{projectionSentence(topHormiga, formatCOP)}</Text>
-          <Text variant="caption" tone="inkMuted">
-            Llevas {formatCOP(hormigas.monthTotal)} en hormigas este mes.
-          </Text>
-        </PressableScale>
-      ) : null}
+      {recommendation ? <RecommendationCard rec={recommendation} /> : null}
     </Screen>
   );
+}
+
+/** Notas bajo el saldo: de dónde sale el número. */
+function captionFor(
+  totals: { usedIncomeEstimate: boolean; savedToGoals: number },
+  estimate: number,
+): string[] {
+  const lines: string[] = [];
+  if (totals.usedIncomeEstimate) {
+    lines.push(`Con tu ingreso de referencia de ${formatCOP(estimate)}.`);
+  }
+  if (totals.savedToGoals > 0) {
+    lines.push(`Ya descontamos ${formatCOP(totals.savedToGoals)} que separaste en Apartados.`);
+  }
+  return lines;
 }
 
 const styles = StyleSheet.create({
@@ -134,14 +121,5 @@ const styles = StyleSheet.create({
   splitRight: {
     paddingLeft: space[4],
     borderLeftWidth: hairline,
-  },
-  block: {
-    marginTop: space[10],
-    gap: space[2],
-    maxWidth: 360,
-  },
-  insight: {
-    borderTopWidth: hairline,
-    paddingTop: space[4],
   },
 });

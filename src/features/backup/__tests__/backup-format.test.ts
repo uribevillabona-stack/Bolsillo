@@ -59,7 +59,10 @@ const sample = (): BackupData => ({
       archived: false,
     },
   ],
-  goalContributions: [{ id: 5, goalId: 2, amount: 50000, note: null, createdAt: T }],
+  goalContributions: [
+    { id: 5, goalId: 2, amount: 50000, note: null, fromSavings: false, createdAt: T },
+  ],
+  budgets: [{ id: 7, categoryId: 1, limitAmount: 60000, createdAt: T }],
 });
 
 const NOW = new Date(2026, 10, 5, 10);
@@ -112,5 +115,21 @@ describe('respaldo', () => {
     const data = sample();
     data.goalContributions[0]!.goalId = 42;
     expect(parseBackup(JSON.stringify(buildBackup(data, NOW))).ok).toBe(false);
+  });
+
+  it('lee respaldos v1 (antes de los topes) con topes vacíos', () => {
+    const { budgets: _omit, ...v1Data } = sample();
+    const v1 = { ...buildBackup(sample(), NOW), schemaVersion: 1, data: v1Data };
+    const r = parseBackup(JSON.stringify(v1));
+    expect(r.ok && r.backup.data.budgets).toEqual([]);
+  });
+
+  it('rechaza topes de categorías inexistentes o repetidos', () => {
+    const missing = sample();
+    missing.budgets[0]!.categoryId = 99;
+    expect(parseBackup(JSON.stringify(buildBackup(missing, NOW))).ok).toBe(false);
+    const dup = sample();
+    dup.budgets.push({ id: 8, categoryId: 1, limitAmount: 1000, createdAt: T });
+    expect(parseBackup(JSON.stringify(buildBackup(dup, NOW))).ok).toBe(false);
   });
 });

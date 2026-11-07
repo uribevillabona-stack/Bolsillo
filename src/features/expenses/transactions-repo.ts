@@ -107,4 +107,9 @@ export function firstHormigaAtQuery(db: Db) {
     .where(and(eq(transactions.type, 'expense'), eq(categories.isHormiga, true)));
 }
 
+/** Un solo id, para saber si hay historia. */
+export function anyTransactionQuery(db: Db) {
+  return db.select({ id: transactions.id }).from(transactions).limit(1);
+}
+
 export type TransactionWithCategory = Awaited<ReturnType<typeof transactionsBetweenQuery>>[number];

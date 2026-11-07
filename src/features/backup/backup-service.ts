@@ -9,13 +9,17 @@
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
+import { useSnackbarStore } from '@/components/snackbar-store';
 import type { Db } from '@/db/client';
 import { chunk } from '@/lib/chunk';
 import {
+  budgetAlerts,
+  budgets,
   categories,
   goalContributions,
   goals,
   profile,
+  recommendationDismissals,
   shortcuts,
   transactions,
 } from '@/db/schema';
@@ -41,6 +45,7 @@ export function collectBackupData(db: Db): BackupData {
     shortcuts: db.select().from(shortcuts).all(),
     goals: db.select().from(goals).all(),
     goalContributions: db.select().from(goalContributions).all(),
+    budgets: db.select().from(budgets).all(),
   });
 }
 
@@ -82,6 +87,9 @@ export function restoreBackup(db: Db, backup: Backup): void {
   const { data } = backup;
   db.transaction((tx) => {
     // Orden inverso a las llaves foráneas.
+    tx.delete(recommendationDismissals).run();
+    tx.delete(budgetAlerts).run();
+    tx.delete(budgets).run();
     tx.delete(goalContributions).run();
     tx.delete(goals).run();
     tx.delete(shortcuts).run();
@@ -101,7 +109,11 @@ export function restoreBackup(db: Db, backup: Backup): void {
     for (const rows of chunk(data.goals, INSERT_BATCH)) tx.insert(goals).values(rows).run();
     for (const rows of chunk(data.goalContributions, INSERT_BATCH))
       tx.insert(goalContributions).values(rows).run();
+    for (const rows of chunk(data.budgets, INSERT_BATCH)) tx.insert(budgets).values(rows).run();
   });
+  // Un "Deshacer" que siga en pantalla apunta a ids de antes de restaurar:
+  // podría borrar una fila del respaldo con el mismo id.
+  useSnackbarStore.getState().dismiss();
 }
 
 /** Filas por INSERT: 500 × 10 columnas = 5.000 variables, lejos del límite de SQLite. */

@@ -110,6 +110,7 @@ function AppNavigator() {
         <Stack.Protected guard={onboarded}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="ajustes" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="apartado/[id]" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="catalogo" options={{ animation: 'slide_from_right' }} />
         </Stack.Protected>
       </Stack>

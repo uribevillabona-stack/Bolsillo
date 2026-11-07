@@ -18,6 +18,8 @@ describe('monthTotals', () => {
       income: 0,
       expenses: 42500,
       today: 2500,
+      savedToGoals: 0,
+      incomeBase: 750000,
       usedIncomeEstimate: true,
       available: 707500,
     });
@@ -44,5 +46,11 @@ describe('monthTotals', () => {
 
   it('sin referencia ni movimientos, todo en cero', () => {
     expect(monthTotals([], NOW, 0).available).toBe(0);
+  });
+
+  it('lo separado en Apartados sale del disponible; un retiro lo devuelve', () => {
+    const rows = [{ type: 'expense', amount: 100000, occurredAt: earlier }];
+    expect(monthTotals(rows, NOW, 800000, 200000).available).toBe(500000);
+    expect(monthTotals(rows, NOW, 800000, -50000).available).toBe(750000);
   });
 });
