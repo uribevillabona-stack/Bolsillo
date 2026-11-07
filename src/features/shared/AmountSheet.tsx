@@ -5,7 +5,7 @@
 import { useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AmountText, Button, NumericKeypad, Sheet, Text } from '@/components';
+import { AmountText, Button, NumericKeypad, Sheet, Text, type SheetError } from '@/components';
 import { digitsToAmount } from '@/lib/money';
 import { space } from '@/theme';
 
@@ -21,6 +21,8 @@ export interface AmountSheetProps {
   maxMessage?: string;
   onConfirm: (amount: number) => void;
   onClose: () => void;
+  /** Error al guardar, de `useSheetError` en la pantalla que lo abre. */
+  error?: SheetError | null;
   /** Opciones extra bajo el monto (p. ej. "Ya la tenía ahorrada"). */
   children?: ReactNode;
 }
@@ -35,6 +37,7 @@ export function AmountSheet({
   maxMessage,
   onConfirm,
   onClose,
+  error = null,
   children,
 }: AmountSheetProps) {
   const [digits, setDigits] = useState(initialAmount > 0 ? String(initialAmount) : '');
@@ -47,7 +50,7 @@ export function AmountSheet({
   const tooMuch = maxAmount !== undefined && amount > maxAmount;
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={title}>
+    <Sheet visible={visible} onClose={onClose} title={title} error={error}>
       {hint ? (
         <Text variant="caption" tone="inkMuted" style={styles.hint}>
           {hint}

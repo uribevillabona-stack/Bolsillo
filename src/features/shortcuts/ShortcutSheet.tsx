@@ -6,7 +6,16 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, Chip, Sheet, showSnackbar, Text, TextField, TrashIcon } from '@/components';
+import {
+  Button,
+  Chip,
+  Sheet,
+  showSnackbar,
+  Text,
+  TextField,
+  TrashIcon,
+  useSheetError,
+} from '@/components';
 import { db } from '@/db/client';
 import { useCategories } from '@/db/hooks';
 import type { Shortcut } from '@/db/schema';
@@ -33,6 +42,7 @@ export interface ShortcutSheetProps {
 
 export function ShortcutSheet({ target, onClose }: ShortcutSheetProps) {
   const categories = useCategories('expense');
+  const { error: failure, showError: showFailure } = useSheetError(target !== null);
   const editing = target !== null && target !== 'new' ? target : null;
 
   const [label, setLabel] = useState('');
@@ -73,7 +83,7 @@ export function ShortcutSheet({ target, onClose }: ShortcutSheetProps) {
       else createShortcut(db, input);
     } catch {
       haptics.reject();
-      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      showFailure('No se pudo guardar. Intenta de nuevo.');
       return;
     }
     haptics.confirm();
@@ -88,7 +98,7 @@ export function ShortcutSheet({ target, onClose }: ShortcutSheetProps) {
       removed = deleteShortcut(db, editing.id);
     } catch {
       haptics.reject();
-      showSnackbar('No se pudo eliminar. Intenta de nuevo.');
+      showFailure('No se pudo eliminar. Intenta de nuevo.');
       return;
     }
     haptics.confirm();
@@ -105,7 +115,8 @@ export function ShortcutSheet({ target, onClose }: ShortcutSheetProps) {
     <Sheet
       visible={target !== null}
       onClose={onClose}
-      title={editing ? 'Editar atajo' : 'Nuevo atajo'}>
+      title={editing ? 'Editar atajo' : 'Nuevo atajo'}
+      error={failure}>
       <View style={styles.form}>
         <TextField
           label="Nombre"

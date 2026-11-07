@@ -16,6 +16,7 @@ import {
   showSnackbar,
   Text,
   TrashIcon,
+  useSheetError,
 } from '@/components';
 import { db } from '@/db/client';
 import { useCategories } from '@/db/hooks';
@@ -46,6 +47,7 @@ export function BudgetSheet({
   spentLastMonth,
 }: BudgetSheetProps) {
   const categories = useCategories('expense');
+  const { error: failure, showError: showFailure } = useSheetError(target !== null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [digits, setDigits] = useState('');
 
@@ -86,7 +88,7 @@ export function BudgetSheet({
       setBudget(db, categoryId, amount, new Date());
     } catch {
       haptics.reject();
-      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      showFailure('No se pudo guardar. Intenta de nuevo.');
       return;
     }
     haptics.confirm();
@@ -105,7 +107,7 @@ export function BudgetSheet({
       removed = removeBudget(db, editing.categoryId);
     } catch {
       haptics.reject();
-      showSnackbar('No se pudo quitar el tope. Intenta de nuevo.');
+      showFailure('No se pudo quitar el tope. Intenta de nuevo.');
       return;
     }
     haptics.confirm();
@@ -126,7 +128,7 @@ export function BudgetSheet({
       : `Tope de ${category?.name ?? ''}`;
 
   return (
-    <Sheet visible={target !== null} onClose={onClose} title={title}>
+    <Sheet visible={target !== null} onClose={onClose} title={title} error={failure}>
       {picking ? (
         available.length === 0 ? (
           <Text variant="body" tone="inkMuted">

@@ -7,9 +7,19 @@
  *   toques en el teclado y el scroll horizontal de chips no lo disparan.
  * - Se mantiene montado mientras corre la animación de salida.
  * - Respeta "reducir movimiento" del sistema.
+ * - `error` (de `useSheetError`) se muestra fijo bajo el título: un snackbar
+ *   quedaría detrás del Modal mientras el sheet está abierto.
  */
 import { useEffect, useState, type ReactNode } from 'react';
-import { Keyboard, Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  AccessibilityInfo,
+  Keyboard,
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {
   GestureDetector,
   GestureHandlerRootView,
@@ -28,6 +38,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { duration, hairline, radius, screenGutter, space, spring, useTheme } from '@/theme';
 
+import type { SheetError } from './sheet-error';
 import { Text } from './Text';
 
 export interface SheetProps {
@@ -37,6 +48,8 @@ export interface SheetProps {
   title: string;
   /** Oculta el título visualmente (sigue disponible para accesibilidad). */
   hideTitle?: boolean;
+  /** Error de la última acción (guardar, eliminar). Ver `useSheetError`. */
+  error?: SheetError | null;
   children: ReactNode;
 }
 
@@ -44,7 +57,14 @@ export interface SheetProps {
 const CLOSE_DISTANCE = 120;
 const CLOSE_VELOCITY = 900;
 
-export function Sheet({ visible, onClose, title, hideTitle = false, children }: SheetProps) {
+export function Sheet({
+  visible,
+  onClose,
+  title,
+  hideTitle = false,
+  error = null,
+  children,
+}: SheetProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
@@ -100,6 +120,11 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
     },
   });
 
+  // El lector de pantalla oye el error aunque el foco esté en "Guardar".
+  useEffect(() => {
+    if (error) AccessibilityInfo.announceForAccessibility(error.message);
+  }, [error]);
+
   const sheetStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.get() }] }));
   const backdropStyle = useAnimatedStyle(() => ({ opacity: backdrop.get() }));
 
@@ -147,6 +172,14 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
                 {title}
               </Text>
             )}
+            {error ? (
+              <View style={styles.error} testID="sheet-error">
+                <View style={[styles.errorMark, { backgroundColor: colors.accent }]} />
+                <Text variant="body" tone="accentText" style={styles.errorText}>
+                  {error.message}
+                </Text>
+              </View>
+            ) : null}
             {/* Scroll solo si el contenido no cabe (p. ej. letra del sistema
                 muy grande en un teléfono pequeño): así "Guardar" nunca queda
                 fuera de alcance, y en el caso normal el arrastre cierra el sheet
@@ -215,5 +248,18 @@ const styles = StyleSheet.create({
   title: {
     marginBottom: space[4],
     paddingHorizontal: screenGutter,
+  },
+  error: {
+    flexDirection: 'row',
+    gap: space[2],
+    marginBottom: space[4],
+    marginHorizontal: screenGutter,
+  },
+  errorMark: {
+    width: 3,
+    borderRadius: 2,
+  },
+  errorText: {
+    flex: 1,
   },
 });

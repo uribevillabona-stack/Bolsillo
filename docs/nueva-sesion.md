@@ -1,7 +1,7 @@
 # Nueva sesión: cómo retomar BOLSILLO
 
 Documento de traspaso entre sesiones de trabajo. Se actualiza al cerrar cada sesión.
-**Última actualización:** 2026-11-07, Fase 6 terminada; solo queda la Fase 3 (aplazada).
+**Última actualización:** 2026-11-07, Fase 6 terminada (con errores dentro de los sheets); solo queda la Fase 3 (aplazada).
 
 ## Para arrancar una sesión nueva
 
@@ -52,20 +52,21 @@ Pega esto al empezar:
   filas tocables son `decorative` (sin paradas de foco repetidas). Revisado con
   `uiautomator dump` en Plan, Apartado y Movimientos.
 - **Estados de error:** si falla la base de datos al arrancar, el splash se oculta y se ve el
-  error; las escrituras de los sheets avisan si fallan, sin cerrar el sheet; respaldo maneja los
-  errores al elegir archivo y al tomar la copia para "Deshacer".
+  error. Si guardar o eliminar falla en un sheet, el error se ve dentro del sheet y el sheet no
+  se cierra: hook `useSheetError` y prop `error` de `Sheet` (un snackbar quedaría detrás del
+  Modal). Respaldo maneja los errores al elegir archivo y al tomar la copia para "Deshacer".
 - **APK final:** `android/app/build/outputs/apk/release/app-release.apk`.
   **No instalarlo encima del development build:** la firma es distinta, Android obliga a
   desinstalar y se pierden los datos de prueba.
 
 ## Qué sigue
 
-1. Fase 3 (detección de notificaciones), cuando lleguen los ejemplos reales de los bancos.
-2. Opcional antes de la sustentación: probar el APK final en otro celular (sin development
+1. Recompilar el APK antes de entregarlo (`npm run prebuild` y `./gradlew assembleRelease` en
+   `android/`): el último se compiló antes de los ajustes finales de la revisión de los errores en
+   los sheets (se borran al abrir; el `try` del aporte cubre solo la escritura).
+2. Fase 3 (detección de notificaciones), cuando lleguen los ejemplos reales de los bancos.
+3. Opcional antes de la sustentación: probar el APK final en otro celular (sin development
    build instalado) y hacer una pasada con TalkBack encendido de verdad.
-3. Nota abierta: si una escritura falla con un sheet abierto, el snackbar de error queda debajo
-   del Modal (se oye con TalkBack y vibra, pero no se ve). Si se quiere, mostrar el error dentro
-   del sheet.
 
 ## Cómo correr la app en el teléfono
 
@@ -90,7 +91,11 @@ Pega esto al empezar:
   abierto. Ya está corregido en `Screen.tsx`.
 - **Montos:** `formatCOP` usa espacio de no separación. El texto libre (lecciones) pasa por
   `keepMoneyTogether`.
-- `adb shell input keyevent 111` (Esc) cierra los sheets. Para cerrar el teclado, usa el botón ✓.
+- Para cerrar un sheet con adb usa `adb shell input keyevent 4` (atrás). **No uses `111` (Esc):**
+  lo cierra, pero después la app deja de recibir toques hasta reiniciarla (pasa también con el
+  código anterior; es cosa de adb, un usuario no lo vive). Para cerrar el teclado, el botón ✓.
+- No mandar "atrás" mientras la app carga el bundle: la saca al inicio del teléfono. Esperar a que
+  `uiautomator dump` muestre `Registrar gasto`.
 - Lanzar agentes de revisión en segundo plano y seguir con trabajo que no toque los mismos archivos.
 - **Groovy:** `signingConfig (cond) ? a : b` se lee como `signingConfig(cond) ? a : b`. Usar
   `signingConfig((cond) ? a : b)`.

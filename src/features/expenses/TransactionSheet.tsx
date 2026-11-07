@@ -4,7 +4,15 @@
  */
 import { StyleSheet, View } from 'react-native';
 
-import { AmountText, Button, ListRow, Sheet, showSnackbar, TrashIcon } from '@/components';
+import {
+  AmountText,
+  Button,
+  ListRow,
+  Sheet,
+  showSnackbar,
+  TrashIcon,
+  useSheetError,
+} from '@/components';
 import { db } from '@/db/client';
 import { reconcileBudgetAlerts } from '@/features/budget/budget-repo';
 import { iconFor } from '@/features/categories/category-icons';
@@ -33,9 +41,14 @@ export interface TransactionSheetProps {
 
 export function TransactionSheet({ transaction: t, onClose }: TransactionSheetProps) {
   const visible = t !== null;
+  const { error, showError } = useSheetError(visible);
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={t?.categoryName ?? 'Movimiento'}>
+    <Sheet
+      visible={visible}
+      onClose={onClose}
+      title={t?.categoryName ?? 'Movimiento'}
+      error={error}>
       {t ? (
         <>
           <AmountText amount={signedAmount(t)} size="large" />
@@ -63,7 +76,7 @@ export function TransactionSheet({ transaction: t, onClose }: TransactionSheetPr
                 removed = deleteTransaction(db, t.id);
               } catch {
                 haptics.reject();
-                showSnackbar('No se pudo eliminar. Intenta de nuevo.');
+                showError('No se pudo eliminar. Intenta de nuevo.');
                 return;
               }
               try {

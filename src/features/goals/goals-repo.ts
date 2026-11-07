@@ -139,6 +139,9 @@ export interface ContributionOptions {
  * Aporte (monto > 0) o retiro (monto < 0). Un retiro nunca deja el
  * Apartado en negativo.
  */
+/** Error para el usuario cuando un retiro dejaría el Apartado en negativo. */
+export const OVERDRAW_MESSAGE = 'No puedes sacar más de lo que hay en el Apartado.';
+
 export function addContribution(
   db: Db,
   goalId: number,
@@ -150,7 +153,7 @@ export function addContribution(
   }
   return db.transaction((tx) => {
     if (amount < 0 && savedFor(tx, goalId) + amount < 0) {
-      throw new Error('No puedes sacar más de lo que hay en el Apartado.');
+      throw new Error(OVERDRAW_MESSAGE);
     }
     const row = tx
       .insert(goalContributions)

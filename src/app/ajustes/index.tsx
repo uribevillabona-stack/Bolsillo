@@ -17,6 +17,7 @@ import {
   showSnackbar,
   Text,
   TextField,
+  useSheetError,
 } from '@/components';
 import { db } from '@/db/client';
 import { useProfile } from '@/db/hooks';
@@ -38,6 +39,7 @@ export default function AjustesScreen() {
   const profile = useProfile();
   const preference = useThemeStore((s) => s.preference);
   const [incomeOpen, setIncomeOpen] = useState(false);
+  const { error: incomeError, showError: showIncomeError } = useSheetError(incomeOpen);
   // null = sin editar: muestra el nombre guardado (que llega en el segundo render).
   const [draftName, setName] = useState<string | null>(null);
   const name = draftName ?? profile?.name ?? '';
@@ -132,12 +134,13 @@ export default function AjustesScreen() {
         hint="Lo que te entra al mes, más o menos. Si registras tus ingresos, usamos esos."
         initialAmount={profile?.monthlyIncomeEstimate ?? 0}
         onClose={() => setIncomeOpen(false)}
+        error={incomeError}
         onConfirm={(amount) => {
           try {
             updateProfile(db, { monthlyIncomeEstimate: amount });
           } catch {
             haptics.reject();
-            showSnackbar('No se pudo guardar. Intenta de nuevo.');
+            showIncomeError('No se pudo guardar. Intenta de nuevo.');
             return;
           }
           setIncomeOpen(false);

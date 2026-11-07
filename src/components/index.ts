@@ -13,6 +13,7 @@ export { ProgressBar, type ProgressBarProps } from './ProgressBar';
 export { ProgressRing, type ProgressRingProps } from './ProgressRing';
 export { Screen, type ScreenProps } from './Screen';
 export { Sheet, type SheetProps } from './Sheet';
+export { useSheetError, type SheetError } from './sheet-error';
 export { Text, type TextProps, type TextTone } from './Text';
 export { Snackbar, type SnackbarProps } from './Snackbar';
 export {

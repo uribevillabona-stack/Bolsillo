@@ -17,6 +17,7 @@ import {
   Text,
   TextField,
   TrashIcon,
+  useSheetError,
 } from '@/components';
 import { PressableScale } from '@/components/PressableScale';
 import { db } from '@/db/client';
@@ -45,6 +46,7 @@ export interface GoalSheetProps {
 
 export function GoalSheet({ target, onClose, onDeleted }: GoalSheetProps) {
   const { colors } = useTheme();
+  const { error: failure, showError: showFailure } = useSheetError(target !== null);
   // Lo último que se abrió: al cerrar, `target` pasa a null, pero el título
   // no debe cambiar mientras el sheet baja.
   const [shown, setShown] = useState(target);
@@ -106,7 +108,7 @@ export function GoalSheet({ target, onClose, onDeleted }: GoalSheetProps) {
       else createGoal(db, input);
     } catch {
       haptics.reject();
-      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      showFailure('No se pudo guardar. Intenta de nuevo.');
       return;
     }
     haptics.confirm();
@@ -121,7 +123,7 @@ export function GoalSheet({ target, onClose, onDeleted }: GoalSheetProps) {
       deleted = deleteGoal(db, editing.id);
     } catch {
       haptics.reject();
-      showSnackbar('No se pudo eliminar. Intenta de nuevo.');
+      showFailure('No se pudo eliminar. Intenta de nuevo.');
       return;
     }
     haptics.confirm();
@@ -139,7 +141,8 @@ export function GoalSheet({ target, onClose, onDeleted }: GoalSheetProps) {
     <Sheet
       visible={target !== null}
       onClose={onClose}
-      title={editing ? 'Editar Apartado' : 'Nuevo Apartado'}>
+      title={editing ? 'Editar Apartado' : 'Nuevo Apartado'}
+      error={failure}>
       <View style={styles.form}>
         <TextField
           label="¿Para qué es?"

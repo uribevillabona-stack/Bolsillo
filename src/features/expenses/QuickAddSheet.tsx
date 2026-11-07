@@ -23,6 +23,7 @@ import {
   TagIcon,
   Text,
   TextField,
+  useSheetError,
 } from '@/components';
 import { db } from '@/db/client';
 import { useCategories, useShortcuts } from '@/db/hooks';
@@ -54,6 +55,7 @@ export interface QuickAddSheetProps {
 export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
   const shortcuts = useShortcuts();
   const categories = useCategories('expense');
+  const { error, showError } = useSheetError(visible);
 
   const [digits, setDigits] = useState('');
   const [shortcutId, setShortcutId] = useState<number | null>(null);
@@ -98,7 +100,7 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
     } catch {
       // El sheet sigue abierto con lo escrito para reintentar.
       haptics.reject();
-      showSnackbar('No se pudo guardar. Intenta de nuevo.');
+      showError('No se pudo guardar el gasto. Intenta de nuevo.');
       return;
     }
     // Alerta suave del presupuesto: va en el mismo snackbar, sin diálogos.
@@ -126,7 +128,7 @@ export function QuickAddSheet({ visible, onClose }: QuickAddSheetProps) {
   };
 
   return (
-    <Sheet visible={visible} onClose={onClose} title="Registrar gasto" hideTitle>
+    <Sheet visible={visible} onClose={onClose} title="Registrar gasto" hideTitle error={error}>
       <View style={styles.header}>
         <Text variant="overline" tone="inkMuted">
           {shortcut?.label ?? category?.name ?? 'Nuevo gasto'}

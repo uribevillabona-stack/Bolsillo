@@ -20,11 +20,12 @@ import {
   Screen,
   showSnackbar,
   Text,
+  useSheetError,
 } from '@/components';
 import { db } from '@/db/client';
 import { paceSentence } from '@/features/goals/goal-logic';
 import { GoalSheet } from '@/features/goals/GoalSheet';
-import { addContribution, removeContribution } from '@/features/goals/goals-repo';
+import { addContribution, OVERDRAW_MESSAGE, removeContribution } from '@/features/goals/goals-repo';
 import { useMonthOverview } from '@/features/overview/use-month-overview';
 import { AmountSheet } from '@/features/shared/AmountSheet';
 import { BackHeader } from '@/features/shared/BackHeader';
@@ -47,6 +48,7 @@ export default function ApartadoScreen() {
   const [sheetMode, setSheetMode] = useState<'add' | 'withdraw'>('add');
   const [fromSavings, setFromSavings] = useState(false);
   const [editing, setEditing] = useState(false);
+  const { error: failure, showError: showFailure } = useSheetError(mode !== null);
 
   const openSheet = (next: 'add' | 'withdraw') => {
     setSheetMode(next);
@@ -73,28 +75,39 @@ export default function ApartadoScreen() {
 
   const confirm = (amount: number) => {
     const signed = mode === 'withdraw' ? -amount : amount;
-    setMode(null);
+    // El sheet se cierra solo si se guardó: si falla, el error se ve dentro
+    // del sheet y el monto escrito sigue ahí para reintentar. El try cubre
+    // solo la escritura: si algo fallara después, un reintento duplicaría el aporte.
+    let result: ReturnType<typeof addContribution>;
     try {
-      const { row, justCompleted } = addContribution(db, goal.id, signed, { fromSavings });
-      if (justCompleted) {
-        haptics.success();
-        showSnackbar(`¡Completaste "${goal.name}"! Ya tienes toda la plata.`, {
-          label: 'Deshacer',
-          onPress: () => removeContribution(db, row.id),
-        });
-        return;
-      }
-      haptics.confirm();
-      showSnackbar(
-        signed > 0
-          ? `Separaste ${formatCOP(amount)} para "${goal.name}"`
-          : `Sacaste ${formatCOP(amount)} de "${goal.name}"`,
-        { label: 'Deshacer', onPress: () => removeContribution(db, row.id) },
-      );
+      result = addContribution(db, goal.id, signed, { fromSavings });
     } catch (e) {
       haptics.reject();
-      showSnackbar(e instanceof Error ? e.message : 'No se pudo guardar.');
+      // Solo el error de dominio se muestra tal cual; uno técnico (SQLite) no.
+      showFailure(
+        e instanceof Error && e.message === OVERDRAW_MESSAGE
+          ? e.message
+          : 'No se pudo guardar. Intenta de nuevo.',
+      );
+      return;
     }
+    const { row, justCompleted } = result;
+    setMode(null);
+    if (justCompleted) {
+      haptics.success();
+      showSnackbar(`¡Completaste "${goal.name}"! Ya tienes toda la plata.`, {
+        label: 'Deshacer',
+        onPress: () => removeContribution(db, row.id),
+      });
+      return;
+    }
+    haptics.confirm();
+    showSnackbar(
+      signed > 0
+        ? `Separaste ${formatCOP(amount)} para "${goal.name}"`
+        : `Sacaste ${formatCOP(amount)} de "${goal.name}"`,
+      { label: 'Deshacer', onPress: () => removeContribution(db, row.id) },
+    );
   };
 
   return (
@@ -192,6 +205,7 @@ export default function ApartadoScreen() {
 
       <AmountSheet
         visible={mode !== null}
+        error={failure}
         title={sheetMode === 'withdraw' ? `Retirar de ${goal.name}` : `Aportar a ${goal.name}`}
         hint={
           sheetMode === 'withdraw'
