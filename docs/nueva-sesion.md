@@ -61,12 +61,12 @@ Pega esto al empezar:
 
 ## Qué sigue
 
-1. Recompilar el APK antes de entregarlo (`npm run prebuild` y `./gradlew assembleRelease` en
-   `android/`): el último se compiló antes de los ajustes finales de la revisión de los errores en
-   los sheets (se borran al abrir; el `try` del aporte cubre solo la escritura).
-2. Fase 3 (detección de notificaciones), cuando lleguen los ejemplos reales de los bancos.
-3. Opcional antes de la sustentación: probar el APK final en otro celular (sin development
-   build instalado) y hacer una pasada con TalkBack encendido de verdad.
+1. Fase 3 (detección de notificaciones), cuando lleguen los ejemplos reales de los bancos.
+2. Opcional antes de la sustentación: una pasada con TalkBack encendido de verdad.
+
+APK final (2026-11-07, commit `6e6c6f6`): compilado, firmado con la clave propia y probado por
+el equipo en otro celular sin development build: funciona. Copia en `C:devBOLSILLO-0.1.0.apk`.
+No está publicado en ningún lado (sin Play Store por el presupuesto cero).
 
 ## Cómo correr la app en el teléfono
 
