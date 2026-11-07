@@ -9,10 +9,16 @@ export { Chip, type ChipProps } from './Chip';
 export * from './icons';
 export { ListRow, type ListRowProps } from './ListRow';
 export { NumericKeypad, type NumericKeypadProps } from './NumericKeypad';
+export { ProgressBar, type ProgressBarProps } from './ProgressBar';
 export { ProgressRing, type ProgressRingProps } from './ProgressRing';
 export { Screen, type ScreenProps } from './Screen';
 export { Sheet, type SheetProps } from './Sheet';
 export { Text, type TextProps, type TextTone } from './Text';
 export { Snackbar, type SnackbarProps } from './Snackbar';
-export { showSnackbar, useSnackbarStore, type SnackbarAction } from './snackbar-store';
+export {
+  showSnackbar,
+  useSnackbarStore,
+  type SnackbarAction,
+  type SnackbarTone,
+} from './snackbar-store';
 export { TextField, type TextFieldProps } from './TextField';

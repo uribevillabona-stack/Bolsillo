@@ -88,7 +88,7 @@ export function AmountText({
           fontSize: Math.round(textStyles[variant].fontSize * currencyScale[size]),
           letterSpacing: 0,
         }}>
-        {'$ '}
+        {'$ '}
       </Text>
       {digits}
     </Text>

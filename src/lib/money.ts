@@ -13,6 +13,9 @@
 const THOUSANDS_SEPARATOR = '.';
 const MINUS_SIGN = '−'; // U+2212: signo menos tipográfico, mismo ancho que "+"
 
+/** Espacio de no separación (U+00A0): "$" y el número nunca quedan en líneas distintas. */
+export const NBSP = ' ';
+
 /** Agrupa los dígitos de un entero no negativo de a tres con punto. */
 export function groupThousands(value: number): string {
   const digits = Math.trunc(Math.abs(value)).toString();
@@ -36,7 +39,7 @@ export interface FormatCOPOptions {
 export function formatCOP(amount: number, options: FormatCOPOptions = {}): string {
   assertSafeAmount(amount);
   const { signed = false, bare = false } = options;
-  const body = bare ? groupThousands(amount) : `$ ${groupThousands(amount)}`;
+  const body = bare ? groupThousands(amount) : `$${NBSP}${groupThousands(amount)}`;
   if (amount < 0) return `${MINUS_SIGN}${body}`;
   if (signed && amount > 0) return `+${body}`;
   return body;

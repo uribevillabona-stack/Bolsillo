@@ -47,7 +47,7 @@ describe('summarizeHormigas', () => {
     expect(s).toMatchObject({ monthTotal: 0, monthCount: 0, annualProjection: 0, categories: [] });
   });
 
-  it('un tinto diario durante 30 días proyecta ~ $ 912.000 al año', () => {
+  it('un tinto diario durante 30 días proyecta ~ $ 912.000 al año', () => {
     const rows = Array.from({ length: 30 }, (_, i) => tinto(NOW.getTime() - i * 86_400_000));
     const s = summarizeHormigas(rows, NOW, rows.at(-1)!.occurredAt);
     expect(s.windowDays).toBe(30);
@@ -89,6 +89,6 @@ describe('projectionSentence', () => {
   it('usa la voz de la app', () => {
     expect(
       projectionSentence({ name: 'Tinto y café', annualProjection: 456_000 }, (n) => formatCOP(n)),
-    ).toBe('A este ritmo, $ 456.000 al año en tinto y café.');
+    ).toBe('A este ritmo, $ 456.000 al año en tinto y café.');
   });
 });

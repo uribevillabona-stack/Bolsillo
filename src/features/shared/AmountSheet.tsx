@@ -2,7 +2,7 @@
  * Sheet genérico para pedir un monto con el teclado propio (ingreso de
  * referencia, monto de un atajo). Reutiliza el mismo patrón del registro.
  */
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AmountText, Button, NumericKeypad, Sheet, Text } from '@/components';
@@ -15,8 +15,14 @@ export interface AmountSheetProps {
   hint?: string;
   initialAmount: number;
   confirmLabel?: string;
+  /** Tope permitido (p. ej. no retirar más de lo que hay). */
+  maxAmount?: number;
+  /** Qué decir si se pasa del tope. */
+  maxMessage?: string;
   onConfirm: (amount: number) => void;
   onClose: () => void;
+  /** Opciones extra bajo el monto (p. ej. "Ya la tenía ahorrada"). */
+  children?: ReactNode;
 }
 
 export function AmountSheet({
@@ -25,8 +31,11 @@ export function AmountSheet({
   hint,
   initialAmount,
   confirmLabel = 'Guardar',
+  maxAmount,
+  maxMessage,
   onConfirm,
   onClose,
+  children,
 }: AmountSheetProps) {
   const [digits, setDigits] = useState(initialAmount > 0 ? String(initialAmount) : '');
   const [wasVisible, setWasVisible] = useState(visible);
@@ -35,6 +44,7 @@ export function AmountSheet({
     if (visible) setDigits(initialAmount > 0 ? String(initialAmount) : '');
   }
   const amount = digitsToAmount(digits);
+  const tooMuch = maxAmount !== undefined && amount > maxAmount;
 
   return (
     <Sheet visible={visible} onClose={onClose} title={title}>
@@ -43,7 +53,17 @@ export function AmountSheet({
           {hint}
         </Text>
       ) : null}
-      <AmountText amount={amount} size="hero" tone={amount === 0 ? 'inkMuted' : 'ink'} />
+      <AmountText
+        amount={amount}
+        size="hero"
+        tone={tooMuch ? 'accentText' : amount === 0 ? 'inkMuted' : 'ink'}
+      />
+      {tooMuch && maxMessage ? (
+        <Text variant="caption" tone="accentText" accessibilityLiveRegion="polite">
+          {maxMessage}
+        </Text>
+      ) : null}
+      {children}
       <View style={styles.keypad}>
         <NumericKeypad value={digits} onChange={setDigits} />
       </View>
@@ -51,7 +71,7 @@ export function AmountSheet({
         label={confirmLabel}
         size="lg"
         block
-        disabled={amount === 0}
+        disabled={amount === 0 || tooMuch}
         onPress={() => onConfirm(amount)}
       />
     </Sheet>
@@ -60,7 +80,6 @@ export function AmountSheet({
 
 const styles = StyleSheet.create({
   hint: {
-    marginTop: -space[2],
     marginBottom: space[2],
   },
   keypad: {

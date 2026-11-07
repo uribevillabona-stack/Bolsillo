@@ -56,7 +56,7 @@ export function Chip({
       ]}>
       <View style={styles.content}>
         {IconComponent ? <IconComponent size={18} color={fg} /> : null}
-        <Text variant="label" style={{ color: fg }}>
+        <Text variant="label" numberOfLines={1} style={{ color: fg }}>
           {label}
         </Text>
         {amount !== undefined ? (

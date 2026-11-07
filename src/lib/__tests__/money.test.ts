@@ -15,20 +15,20 @@ describe('groupThousands', () => {
 
 describe('formatCOP', () => {
   it('usa el formato colombiano con espacio tras el símbolo', () => {
-    expect(formatCOP(12500)).toBe('$ 12.500');
+    expect(formatCOP(12500)).toBe('$ 12.500');
   });
 
   it('formatea cero', () => {
-    expect(formatCOP(0)).toBe('$ 0');
+    expect(formatCOP(0)).toBe('$ 0');
   });
 
   it('usa el signo menos tipográfico en egresos', () => {
-    expect(formatCOP(-3000)).toBe('−$ 3.000');
+    expect(formatCOP(-3000)).toBe('−$ 3.000');
   });
 
   it('agrega + solo si se pide y el monto es positivo', () => {
-    expect(formatCOP(50000, { signed: true })).toBe('+$ 50.000');
-    expect(formatCOP(0, { signed: true })).toBe('$ 0');
+    expect(formatCOP(50000, { signed: true })).toBe('+$ 50.000');
+    expect(formatCOP(0, { signed: true })).toBe('$ 0');
   });
 
   it('omite el símbolo en modo bare', () => {

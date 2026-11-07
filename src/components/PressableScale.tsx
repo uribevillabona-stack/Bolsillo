@@ -2,7 +2,9 @@
  * Primitiva interna: un Pressable que se encoge levemente al presionarlo y,
  * opcionalmente, cambia su fondo. Lo usan Button, Chip, ListRow y las teclas
  * del teclado para que todos respondan al toque con la misma física.
- * No se usa directamente en pantallas.
+ * En pantallas se usa solo para filas o bloques tocables a la medida (una
+ * fila de presupuesto, la tarjeta de un Apartado); para lo demás, Button,
+ * Chip o ListRow.
  */
 import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {

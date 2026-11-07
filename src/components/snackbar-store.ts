@@ -15,16 +15,20 @@ export interface SnackbarAction {
   onPress: () => void;
 }
 
+/** alert: aviso de gasto (presupuesto). Lleva una marca coral. */
+export type SnackbarTone = 'default' | 'alert';
+
 export interface SnackbarMessage {
   /** Cambia con cada mensaje: reinicia el temporizador aunque el texto se repita. */
   key: number;
   text: string;
   action?: SnackbarAction;
+  tone: SnackbarTone;
 }
 
 interface SnackbarState {
   current: SnackbarMessage | null;
-  show: (text: string, action?: SnackbarAction) => void;
+  show: (text: string, action?: SnackbarAction, tone?: SnackbarTone) => void;
   dismiss: () => void;
 }
 
@@ -32,10 +36,11 @@ let nextKey = 1;
 
 export const useSnackbarStore = create<SnackbarState>((set) => ({
   current: null,
-  show: (text, action) => set({ current: { key: nextKey++, text, action } }),
+  show: (text, action, tone = 'default') =>
+    set({ current: { key: nextKey++, text, action, tone } }),
   dismiss: () => set({ current: null }),
 }));
 
 /** Atajo para usar fuera de componentes (servicios, callbacks). */
-export const showSnackbar = (text: string, action?: SnackbarAction) =>
-  useSnackbarStore.getState().show(text, action);
+export const showSnackbar = (text: string, action?: SnackbarAction, tone?: SnackbarTone) =>
+  useSnackbarStore.getState().show(text, action, tone);

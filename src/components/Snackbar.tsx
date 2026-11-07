@@ -75,7 +75,10 @@ export function Snackbar({ bottomOffset = 0 }: SnackbarProps) {
         styles.bar,
         { backgroundColor: colors.ink, bottom: insets.bottom + bottomOffset + space[3] },
       ]}>
-      <Text variant="label" style={[styles.text, { color: colors.bg }]} numberOfLines={2}>
+      {current.tone === 'alert' ? (
+        <View style={[styles.mark, { backgroundColor: colors.accent }]} />
+      ) : null}
+      <Text variant="label" style={[styles.text, { color: colors.bg }]} numberOfLines={3}>
         {current.text}
       </Text>
       {current.action ? (
@@ -111,6 +114,15 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
     paddingVertical: space[3],
+  },
+  mark: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    borderTopLeftRadius: radius.sm,
+    borderBottomLeftRadius: radius.sm,
   },
   action: {
     minHeight: minTouchTarget,

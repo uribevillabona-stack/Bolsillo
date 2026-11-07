@@ -9,7 +9,7 @@
  * - Respeta "reducir movimiento" del sistema.
  */
 import { useEffect, useState, type ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Keyboard, Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import {
   GestureDetector,
   GestureHandlerRootView,
@@ -59,6 +59,10 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
   const [viewportHeight, setViewportHeight] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
   const scrollable = contentHeight > viewportHeight + 1;
+
+  // Con el teclado abierto, el sheet sube por encima de él (el Modal de
+  // Android no se ajusta solo cuando es edge-to-edge).
+  const keyboardHeight = useKeyboardHeight(visible);
 
   const translateY = useSharedValue(screenHeight);
   const backdrop = useSharedValue(0);
@@ -131,7 +135,8 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
               {
                 backgroundColor: colors.surface,
                 borderColor: colors.line,
-                paddingBottom: insets.bottom + space[4],
+                paddingBottom:
+                  keyboardHeight > 0 ? keyboardHeight + space[3] : insets.bottom + space[4],
                 maxHeight: screenHeight - insets.top - space[8],
               },
               sheetStyle,
@@ -162,6 +167,22 @@ export function Sheet({ visible, onClose, title, hideTitle = false, children }: 
       </GestureHandlerRootView>
     </Modal>
   );
+}
+
+/** Alto del teclado en pantalla (0 si está cerrado). Solo escucha con el sheet abierto. */
+function useKeyboardHeight(active: boolean): number {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    const show = Keyboard.addListener('keyboardDidShow', (e) => setHeight(e.endCoordinates.height));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setHeight(0));
+    return () => {
+      show.remove();
+      hide.remove();
+      setHeight(0);
+    };
+  }, [active]);
+  return height;
 }
 
 const styles = StyleSheet.create({

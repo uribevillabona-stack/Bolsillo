@@ -18,7 +18,7 @@ describe('registro rápido', () => {
   });
 
   it('arma el mensaje de confirmación', () => {
-    expect(savedMessage('Tinto', '$ 2.500')).toBe('Tinto · $ 2.500 guardado');
-    expect(savedMessage(null, '$ 8.000')).toBe('$ 8.000 guardado');
+    expect(savedMessage('Tinto', '$ 2.500')).toBe('Tinto · $ 2.500 guardado');
+    expect(savedMessage(null, '$ 8.000')).toBe('$ 8.000 guardado');
   });
 });

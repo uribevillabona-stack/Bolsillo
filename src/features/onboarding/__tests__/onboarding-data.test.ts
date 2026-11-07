@@ -21,7 +21,7 @@ describe('estimateForRange', () => {
 describe('parseTypedAmount', () => {
   it('acepta montos con o sin puntos', () => {
     expect(parseTypedAmount('1.500.000')).toBe(1_500_000);
-    expect(parseTypedAmount('$ 80000')).toBe(80_000);
+    expect(parseTypedAmount('$ 80000')).toBe(80_000);
   });
 
   it('rechaza vacío, cero y montos absurdos', () => {

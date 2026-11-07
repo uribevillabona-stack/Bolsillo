@@ -38,6 +38,10 @@ export function Screen({ children, scroll = true, bottomInset = 0, contentStyle 
     <ScrollView
       style={{ backgroundColor: colors.bg }}
       contentContainerStyle={[styles.base, padding, contentStyle]}
+      // "handled": un toque en un botón no se gasta en cerrar el teclado. Importa
+      // también para los sheets: el Modal cuelga de esta pantalla, y este scroll
+      // (ancestro en el sistema de toques) se quedaba con el primer toque.
+      keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}>
       {children}
     </ScrollView>
