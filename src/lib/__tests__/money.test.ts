@@ -1,4 +1,4 @@
-import { digitsToAmount, formatCOP, groupThousands, spokenCOP } from '../money';
+import { digitsToAmount, formatCOP, groupThousands, keepMoneyTogether, spokenCOP } from '../money';
 
 describe('groupThousands', () => {
   it.each([
@@ -56,5 +56,14 @@ describe('digitsToAmount', () => {
 
   it('rechaza caracteres que no son dígitos', () => {
     expect(() => digitsToAmount('12.500')).toThrow();
+  });
+});
+
+describe('keepMoneyTogether', () => {
+  it('une "$" con la cifra en textos libres', () => {
+    expect(keepMoneyTogether('Un tinto de $ 2.500 y $ 600.000 al año')).toBe(
+      'Un tinto de $ 2.500 y $ 600.000 al año',
+    );
+    expect(keepMoneyTogether('Cuesta $ mucho')).toBe('Cuesta $ mucho');
   });
 });

@@ -1,0 +1,70 @@
+{
+  "id": "estafas-transferencias",
+  "order": 5,
+  "title": "Estafas por transferencia",
+  "summary": "Los cuentos más comunes y cómo no caer.",
+  "minutes": 4,
+  "cards": [
+    {
+      "title": "Te puede pasar a ti",
+      "body": "Las estafas no le pasan solo a la gente distraída. Están hechas para que actúes rápido y sin pensar: con afán, con miedo o con emoción. La mejor defensa es frenar."
+    },
+    {
+      "title": "\"Le consigné por error\"",
+      "body": "Te llega una plata y alguien te escribe pidiendo que se la devuelvas a otro número. A veces la consignación ni existe, o la reversan después y quedas debiendo. Si de verdad fue un error, que lo resuelva el banco, no tú."
+    },
+    {
+      "title": "El pantallazo falso",
+      "body": "Vendes algo y te mandan la foto de un comprobante. Los pantallazos se falsifican fácil. Entrega solo cuando veas la plata en TU app del banco, no en una imagen."
+    },
+    {
+      "title": "\"Soy del banco\"",
+      "highlight": "El banco nunca te pide claves ni códigos",
+      "body": "Ni por llamada, ni por WhatsApp, ni por correo. Si alguien te pide la clave o el código que te llegó por mensaje, es estafa. Cuelga y llama tú a la línea oficial."
+    },
+    {
+      "title": "El familiar con número nuevo",
+      "body": "\"Hola, soy yo, cambié de número, préstame para una urgencia.\" Antes de mandar un peso, llama al número de siempre o pregunta algo que solo esa persona sabría."
+    },
+    {
+      "title": "Links y premios",
+      "body": "Un mensaje dice que ganaste algo o que tu cuenta está bloqueada, con un link para \"verificar\". No lo abras. Entra a tu banco solo desde su app."
+    },
+    {
+      "title": "Si ya caíste",
+      "body": "Llama de inmediato a tu banco para bloquear y reportar. Cambia tus claves. Denuncia ante la Policía o la Fiscalía. Actuar rápido aumenta la posibilidad de recuperar algo."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Te escriben: \"Soy de tu banco, dime el código que te acaba de llegar\". ¿Qué haces?",
+      "options": [
+        "Se lo doy, es del banco",
+        "No lo doy y llamo yo a la línea oficial",
+        "Le pido que me lo diga primero"
+      ],
+      "answer": 1,
+      "explanation": "Ningún banco pide códigos ni claves. Ese código es la llave de tu cuenta."
+    },
+    {
+      "question": "Vendes tu bicicleta y el comprador te manda un pantallazo del pago. ¿Cuándo entregas?",
+      "options": [
+        "Apenas llega el pantallazo",
+        "Cuando la plata aparece en mi app del banco",
+        "Cuando me mande dos pantallazos"
+      ],
+      "answer": 1,
+      "explanation": "Un pantallazo se falsifica en segundos. La prueba es tu saldo, no una imagen."
+    },
+    {
+      "question": "Te llega una plata \"por error\" y te piden devolverla a otro número. ¿Qué es lo más seguro?",
+      "options": [
+        "Devolverla rápido a ese número",
+        "Pedir que el banco haga la reversión",
+        "Quedármela sin decir nada"
+      ],
+      "answer": 1,
+      "explanation": "Si fue un error real, el banco lo reversa. Si devuelves tú a otro número, puede ser un fraude y quedas debiendo."
+    }
+  ]
+}

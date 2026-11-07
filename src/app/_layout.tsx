@@ -32,6 +32,9 @@ import { fontAssets, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
+// Si una pantalla falla al dibujarse, se muestra un error amable con "Reintentar".
+export { RouteError as ErrorBoundary } from '@/features/shared/RouteError';
+
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(fontAssets);
   const { scheme, colors } = useTheme();
@@ -111,6 +114,7 @@ function AppNavigator() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="ajustes" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="apartado/[id]" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="leccion/[id]" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="catalogo" options={{ animation: 'slide_from_right' }} />
         </Stack.Protected>
       </Stack>

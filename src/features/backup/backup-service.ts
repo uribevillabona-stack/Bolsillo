@@ -18,6 +18,7 @@ import {
   categories,
   goalContributions,
   goals,
+  lessonCompletions,
   profile,
   recommendationDismissals,
   shortcuts,
@@ -46,6 +47,7 @@ export function collectBackupData(db: Db): BackupData {
     goals: db.select().from(goals).all(),
     goalContributions: db.select().from(goalContributions).all(),
     budgets: db.select().from(budgets).all(),
+    lessonCompletions: db.select().from(lessonCompletions).all(),
   });
 }
 
@@ -88,6 +90,7 @@ export function restoreBackup(db: Db, backup: Backup): void {
   db.transaction((tx) => {
     // Orden inverso a las llaves foráneas.
     tx.delete(recommendationDismissals).run();
+    tx.delete(lessonCompletions).run();
     tx.delete(budgetAlerts).run();
     tx.delete(budgets).run();
     tx.delete(goalContributions).run();
@@ -110,6 +113,8 @@ export function restoreBackup(db: Db, backup: Backup): void {
     for (const rows of chunk(data.goalContributions, INSERT_BATCH))
       tx.insert(goalContributions).values(rows).run();
     for (const rows of chunk(data.budgets, INSERT_BATCH)) tx.insert(budgets).values(rows).run();
+    for (const rows of chunk(data.lessonCompletions, INSERT_BATCH))
+      tx.insert(lessonCompletions).values(rows).run();
   });
   // Un "Deshacer" que siga en pantalla apunta a ids de antes de restaurar:
   // podría borrar una fila del respaldo con el mismo id.

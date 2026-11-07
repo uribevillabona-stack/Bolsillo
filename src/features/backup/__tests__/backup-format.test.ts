@@ -63,6 +63,7 @@ const sample = (): BackupData => ({
     { id: 5, goalId: 2, amount: 50000, note: null, fromSavings: false, createdAt: T },
   ],
   budgets: [{ id: 7, categoryId: 1, limitAmount: 60000, createdAt: T }],
+  lessonCompletions: [{ id: 1, lessonId: 'gastos-hormiga', score: 2, total: 2, completedAt: T }],
 });
 
 const NOW = new Date(2026, 10, 5, 10);
@@ -118,7 +119,7 @@ describe('respaldo', () => {
   });
 
   it('lee respaldos v1 (antes de los topes) con topes vacíos', () => {
-    const { budgets: _omit, ...v1Data } = sample();
+    const { budgets: _omit, lessonCompletions: _omit2, ...v1Data } = sample();
     const v1 = { ...buildBackup(sample(), NOW), schemaVersion: 1, data: v1Data };
     const r = parseBackup(JSON.stringify(v1));
     expect(r.ok && r.backup.data.budgets).toEqual([]);

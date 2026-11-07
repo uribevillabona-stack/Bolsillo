@@ -1,0 +1,62 @@
+{
+  "id": "presupuesto-50-30-20",
+  "order": 2,
+  "title": "El 50/30/20, a tu medida",
+  "summary": "Una regla simple para repartir lo que te entra.",
+  "minutes": 4,
+  "cards": [
+    {
+      "title": "Un presupuesto es un plan, no un castigo",
+      "body": "Presupuestar es decidir antes a dónde va tu plata, en vez de preguntarte a fin de mes a dónde se fue. No hace falta Excel: basta con tres cajas."
+    },
+    {
+      "title": "Las tres cajas",
+      "highlight": "50 · 30 · 20",
+      "body": "50 % para lo necesario: transporte, comida, arriendo, matrícula.\n30 % para lo que quieres: salidas, ropa, suscripciones, antojos.\n20 % para ahorrar o pagar deudas."
+    },
+    {
+      "title": "Un ejemplo con $ 900.000",
+      "body": "Lo necesario: $ 450.000.\nLo que quieres: $ 270.000.\nAhorro: $ 180.000.\nSi el ahorro te parece mucho, empieza con menos. Lo importante es que exista."
+    },
+    {
+      "title": "Ajústalo a tu vida",
+      "body": "Si vives con tu familia y no pagas arriendo, lo necesario pesa menos: puedes ahorrar más del 20 %. Si vives solo y pagas todo, quizá lo necesario se lleve el 60 %. La regla es un punto de partida, no una ley."
+    },
+    {
+      "title": "Ahorra primero, gasta después",
+      "body": "El truco que más funciona: el día que te entra la plata, separa el ahorro de una vez. Si esperas a ver qué sobra, casi nunca sobra."
+    },
+    {
+      "title": "Cómo hacerlo en BOLSILLO",
+      "body": "En Plan ponle tope a las categorías que más se te van. Te avisamos con calma cuando vayas en el 80 %. Y lo del ahorro, mándalo a un Apartado: sale de tu disponible del mes."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Con la regla 50/30/20, ¿en qué caja va una suscripción de streaming?",
+      "options": ["Lo necesario (50 %)", "Lo que quiero (30 %)", "Ahorro (20 %)"],
+      "answer": 1,
+      "explanation": "Una suscripción de entretenimiento es un gusto, no una necesidad. Está bien tenerla, pero va en el 30 %."
+    },
+    {
+      "question": "¿Cuándo conviene separar el ahorro?",
+      "options": [
+        "Apenas te entra la plata",
+        "A fin de mes, con lo que sobre",
+        "Solo cuando ganes más"
+      ],
+      "answer": 0,
+      "explanation": "Si ahorras lo que sobra, casi nunca sobra. Sepáralo primero y vive con el resto."
+    },
+    {
+      "question": "Vives con tu familia y no pagas arriendo. ¿Qué tiene sentido?",
+      "options": [
+        "Seguir el 50/30/20 al pie de la letra",
+        "Aprovechar para ahorrar más del 20 %",
+        "Gastar más en gustos porque igual alcanza"
+      ],
+      "answer": 1,
+      "explanation": "Si tus gastos fijos son bajos, es el mejor momento para ahorrar más. Después, con arriendo, cuesta más."
+    }
+  ]
+}

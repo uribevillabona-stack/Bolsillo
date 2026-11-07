@@ -8,7 +8,7 @@
  * - Booleanos: INTEGER 0/1 (modo 'boolean' de Drizzle).
  *
  * Cada fase agrega sus tablas con una migración nueva (0001: presupuesto y
- * recomendaciones; Fase 3: pending_movements y merchant_rules; Fase 5: lecciones).
+ * recomendaciones; 0002: lecciones; Fase 3: pending_movements y merchant_rules).
  * Para cambiar el esquema: editar este archivo y correr `npm run db:generate`.
  */
 import { sql } from 'drizzle-orm';
@@ -158,6 +158,25 @@ export const recommendationDismissals = sqliteTable('recommendation_dismissals',
   dismissedAt: integer('dismissed_at').notNull(),
 });
 
+/**
+ * Lecciones terminadas. Una fila por cada vez que se termina (repasar
+ * también cuenta para la racha semanal). El contenido vive en
+ * content/lessons/*.json; aquí solo el id.
+ */
+export const lessonCompletions = sqliteTable(
+  'lesson_completions',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    lessonId: text('lesson_id').notNull(),
+    /** Respuestas correctas del quiz. */
+    score: integer('score').notNull(),
+    /** Preguntas del quiz. */
+    total: integer('total').notNull(),
+    completedAt: integer('completed_at').notNull(),
+  },
+  (t) => [index('lesson_completions_lesson_idx').on(t.lessonId)],
+);
+
 export type Profile = typeof profile.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
@@ -168,6 +187,7 @@ export type NewShortcut = typeof shortcuts.$inferInsert;
 export type Goal = typeof goals.$inferSelect;
 export type GoalContribution = typeof goalContributions.$inferSelect;
 export type Budget = typeof budgets.$inferSelect;
+export type LessonCompletion = typeof lessonCompletions.$inferSelect;
 
 export type TransactionType = 'expense' | 'income' | 'transfer_in' | 'transfer_out';
 export type TransactionSource = 'manual' | 'shortcut' | 'detected' | 'shared';

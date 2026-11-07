@@ -23,7 +23,10 @@ se aprobaron. Se actualiza al cerrar cada fase.
 | 2026-11-06 | Cuota mensual de un Apartado = lo que faltaba al empezar el mes ÷ meses que quedan (contando el actual): aportar a mitad de mes no baja la cuota de ese mes.                                                                    |
 | 2026-11-06 | Recomendaciones: motor de reglas locales ordenadas por prioridad; "Ahora no" la oculta 3 días (`recommendation_dismissals`).                                                                                                    |
 | 2026-11-06 | Montos con espacio de no separación (U+00A0) entre `$` y el número: nunca quedan en líneas distintas.                                                                                                                           |
-| 2026-11-06 | Respaldo v2: incluye los topes. Un respaldo v1 se sigue leyendo (sin topes).                                                                                                                                                    |
+| 2026-11-06 | Respaldo v2: incluye los topes, los aportes "ya la tenía ahorrada" y las lecciones terminadas. Un respaldo v1 se sigue leyendo.                                                                                                 |
+| 2026-11-06 | Aprende: ninguna lección se bloquea. Según los datos cambia cuál se sugiere y por qué (hormigas +30 % frente al mismo tramo del mes pasado, tope apretado, respuestas del diagnóstico, sin Apartados).                          |
+| 2026-11-06 | Racha semanal: una semana cuenta si se termina una lección o se anotan gastos 3 días distintos; la semana en curso no rompe la racha hasta que termina. Sin puntos ni medallas.                                                 |
+| 2026-11-06 | Lecciones (5): gastos hormiga, 50/30/20, fondo de emergencia, tarjeta de crédito, estafas por transferencia. El contenido se valida con zod en las pruebas.                                                                     |
 
 ## Fases
 
@@ -33,7 +36,7 @@ se aprobaron. Se actualiza al cerrar cada fase.
 | 2. Gastos hormiga       | Drizzle + migraciones, onboarding, registro rápido con persistencia y deshacer, vista Hormigas con proyección anual, atajos editables, exportar/importar JSON                                              | Hecha     |
 | 3. Detección (aplazada) | Módulo Kotlin `NotificationListenerService` + cola nativa, parsers por banco con pruebas, deduplicación, bandeja de pendientes, aprendizaje comercio → categoría, intent de compartir, `docs/deteccion.md` | Pendiente |
 | 4. Plan e Inicio        | Presupuesto por categoría con alerta al 80 %, Apartados, dashboard, motor de recomendaciones                                                                                                               | Hecha     |
-| 5. Aprende              | 5 lecciones en JSON + quiz, desbloqueo por comportamiento, racha semanal                                                                                                                                   | Pendiente |
+| 5. Aprende              | 5 lecciones en JSON + quiz, recomendación por comportamiento, racha semanal                                                                                                                                | Hecha     |
 | 6. Pulido               | Modo oscuro completo, TalkBack, estados vacíos y de error, APK firmado con clave propia                                                                                                                    | Pendiente |
 
 ## Pantallas
@@ -68,7 +71,7 @@ Montos: `INTEGER` en pesos. Fechas: epoch en milisegundos.
 | `budget_alerts`             | (`month`, `category_id`, `threshold`) PK, `shown_at` — avisos del 80 % / 100 % ya mostrados                                                                                                        |
 | `goals` (Apartados)         | `id`, `name`, `target_amount`, `target_date`, `created_at`, `completed_at`, `archived`                                                                                                             |
 | `goal_contributions`        | `id`, `goal_id`, `amount` (negativo = retiro), `note`, `created_at`                                                                                                                                |
-| `lesson_progress`           | `lesson_id` (PK), `status`, `started_at`, `completed_at`, `score`                                                                                                                                  |
+| `lesson_completions`        | `id`, `lesson_id`, `score`, `total`, `completed_at` — una fila por cada vez que se termina                                                                                                         |
 | `recommendation_dismissals` | `rule_key` (PK), `dismissed_at`                                                                                                                                                                    |
 
 ## Riesgos

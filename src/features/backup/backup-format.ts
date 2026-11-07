@@ -11,8 +11,9 @@ import { z } from 'zod';
 export const BACKUP_APP_ID = 'bolsillo';
 /**
  * Sube cuando cambie la forma de `data`.
- * v1: Fase 2. v2: + topes de presupuesto y aportes "ya la tenía ahorrada"
- * (un respaldo v1 se lee con topes vacíos y aportes normales).
+ * v1: Fase 2. v2: + topes de presupuesto, aportes "ya la tenía ahorrada" y
+ * lecciones terminadas (un respaldo v1 se lee con esas listas vacías). v2 se
+ * amplió antes de la primera entrega: todo campo nuevo trae valor por defecto.
  */
 export const BACKUP_SCHEMA_VERSION = 2;
 
@@ -92,6 +93,14 @@ const budgetSchema = z.object({
   createdAt: timestamp,
 });
 
+const lessonCompletionSchema = z.object({
+  id,
+  lessonId: z.string().min(1).max(60),
+  score: z.int().nonnegative(),
+  total: z.int().positive(),
+  completedAt: timestamp,
+});
+
 export const backupDataSchema = z.object({
   profile: profileSchema,
   categories: z.array(categorySchema),
@@ -100,6 +109,7 @@ export const backupDataSchema = z.object({
   goals: z.array(goalSchema),
   goalContributions: z.array(goalContributionSchema),
   budgets: z.array(budgetSchema).default([]),
+  lessonCompletions: z.array(lessonCompletionSchema).default([]),
 });
 
 export const backupSchema = z.object({

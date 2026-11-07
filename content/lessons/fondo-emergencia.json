@@ -1,0 +1,52 @@
+{
+  "id": "fondo-emergencia",
+  "order": 3,
+  "title": "Tu fondo de emergencia",
+  "summary": "La plata que te salva cuando algo se daña.",
+  "minutes": 3,
+  "cards": [
+    {
+      "title": "Las emergencias sí llegan",
+      "body": "Se te cae el celular, te enfermas, se acaba el contrato o hay que viajar de urgencia. No es pesimismo: tarde o temprano pasa algo que no estaba en el plan."
+    },
+    {
+      "title": "¿Qué es un fondo de emergencia?",
+      "body": "Es plata separada solo para imprevistos. No es para el viaje ni para el concierto. Su trabajo es que una emergencia no se convierta en deuda."
+    },
+    {
+      "title": "¿Cuánto debería tener?",
+      "highlight": "3 a 6 meses",
+      "body": "La meta clásica es lo que gastas en lo básico durante 3 a 6 meses. Si eso suena imposible, empieza por una meta pequeña: lo que cuesta arreglar el celular, o un mes de gastos."
+    },
+    {
+      "title": "Dónde guardarlo",
+      "body": "En un lugar seguro y que puedas sacar rápido: una cuenta de ahorros o un espacio aparte dentro de tu app del banco. No en algo que pueda bajar de valor, ni en efectivo debajo del colchón. BOLSILLO no guarda plata: con un Apartado le llevas la cuenta."
+    },
+    {
+      "title": "Poquito, pero fijo",
+      "body": "$ 20.000 cada quincena son $ 480.000 en un año. Lo que más importa no es el monto, es la constancia. Si tu banco te deja programarlo, mejor."
+    },
+    {
+      "title": "Si lo usas, se repone",
+      "body": "Usar el fondo para una emergencia de verdad es exactamente para lo que existe. Luego vuelve a llenarlo, poco a poco, antes de otras metas."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "¿Cuál de estos es un buen uso del fondo de emergencia?",
+      "options": [
+        "Boletas para un concierto",
+        "Arreglar el celular que usas para trabajar",
+        "Aprovechar un descuento en tenis"
+      ],
+      "answer": 1,
+      "explanation": "Es un imprevisto necesario. El concierto y los tenis son gustos: para eso están otros Apartados."
+    },
+    {
+      "question": "Si separas $ 20.000 cada quincena, ¿cuánto tienes en un año?",
+      "options": ["$ 240.000", "$ 480.000", "$ 960.000"],
+      "answer": 1,
+      "explanation": "Son 24 quincenas al año: 24 × $ 20.000 = $ 480.000."
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "tarjeta-credito",
+  "order": 4,
+  "title": "La tarjeta de crédito y su costo real",
+  "summary": "Cuotas, intereses y el pago mínimo, sin letra pequeña.",
+  "minutes": 4,
+  "cards": [
+    {
+      "title": "No es plata tuya",
+      "body": "Una tarjeta de crédito es un préstamo que el banco te hace cada vez que la usas. Bien usada te ayuda a construir historial. Mal usada, se vuelve una deuda que crece sola."
+    },
+    {
+      "title": "Lo que te cobran",
+      "body": "Cuota de manejo: lo que muchas tarjetas cobran por tenerla, a veces aunque no la uses. Hay opciones sin cuota.\nIntereses: lo que pagas por no pagar todo de una.\nAvances: sacar efectivo con la tarjeta. Suelen cobrar intereses desde el primer día y a veces una comisión."
+    },
+    {
+      "title": "El truco del pago mínimo",
+      "highlight": "Pago mínimo no es ponerse al día",
+      "body": "El extracto te muestra un pago mínimo pequeño. Si solo pagas eso, el resto sigue cobrando intereses mes a mes y la deuda tarda muchísimo en bajar."
+    },
+    {
+      "title": "Un ejemplo",
+      "body": "Compras unos audífonos de $ 600.000 a 24 cuotas. Con un interés de ejemplo del 1,8 % mensual, terminarías pagando cerca de $ 745.000. La tasa real depende de tu banco; la Superfinanciera fija el tope legal. Los mismos audífonos a 1 cuota normalmente no pagan intereses."
+    },
+    {
+      "title": "Reglas de oro",
+      "body": "1. Compra con la tarjeta solo lo que podrías pagar hoy.\n2. Paga el total del extracto, no el mínimo.\n3. Difiere a 1 cuota siempre que puedas.\n4. Evita los avances."
+    },
+    {
+      "title": "Tu historial crediticio",
+      "body": "Lo que haces con tus créditos queda registrado en las centrales de riesgo, como Datacrédito y TransUnion. Pagar a tiempo te abre puertas: un crédito para estudiar, un arriendo. Atrasarte las cierra."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Si solo pagas el mínimo de tu tarjeta cada mes…",
+      "options": [
+        "Quedas al día y no pagas intereses",
+        "El resto sigue cobrando intereses",
+        "El banco te perdona lo que falta"
+      ],
+      "answer": 1,
+      "explanation": "El mínimo evita que quedes en mora, pero lo que no pagas sigue generando intereses."
+    },
+    {
+      "question": "¿Cuál suele ser la forma más barata de usar la tarjeta?",
+      "options": [
+        "Diferir a 36 cuotas",
+        "Sacar avances en efectivo",
+        "Comprar a 1 cuota y pagar el total"
+      ],
+      "answer": 2,
+      "explanation": "A 1 cuota y pagando el total del extracto, normalmente no pagas intereses."
+    }
+  ]
+}

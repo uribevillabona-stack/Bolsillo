@@ -79,3 +79,12 @@ function assertSafeAmount(amount: number): void {
     throw new Error(`Monto inválido: ${amount}. Los montos deben ser enteros en pesos.`);
   }
 }
+
+/**
+ * Pone espacio de no separación entre "$" y la cifra en un texto libre (p. ej.
+ * el contenido de las lecciones, escrito a mano con espacio normal): así "$" y
+ * "600.000" nunca quedan en líneas distintas.
+ */
+export function keepMoneyTogether(text: string): string {
+  return text.replace(/\$ (?=\d)/g, `$${NBSP}`);
+}

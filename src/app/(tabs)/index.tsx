@@ -1,6 +1,6 @@
 /**
  * Inicio. Solo lo esencial: saldo disponible del mes, gasto de hoy,
- * pendientes por confirmar, una recomendación y (Fase 5) la próxima lección.
+ * pendientes por confirmar, una recomendación y la próxima lección.
  * La recomendación sale del motor de reglas locales (features/recommendations).
  */
 import { router } from 'expo-router';
@@ -8,8 +8,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { AmountText, GearSixIcon, Screen, Text } from '@/components';
 import { PressableScale } from '@/components/PressableScale';
-import { TAB_BAR_HEIGHT } from '@/components/TabBar';
+import { QUICK_ADD_BUTTON_CLEARANCE } from '@/components/QuickAddButton';
 import { useMonthOverview } from '@/features/overview/use-month-overview';
+import { NextLessonRow } from '@/features/learn/NextLessonRow';
+import { useLearn } from '@/features/learn/use-learn';
 import { RecommendationCard } from '@/features/recommendations/RecommendationCard';
 import { daysLeftLabel, monthName } from '@/lib/dates';
 import { formatCOP } from '@/lib/money';
@@ -20,11 +22,15 @@ import { hairline, minTouchTarget, space, useTheme } from '@/theme';
 export default function InicioScreen() {
   const { colors } = useTheme();
   const now = useNow();
-  const { profile, totals, recommendation } = useMonthOverview(now);
+  const { loaded, profile, totals, recommendation, budgets, goals } = useMonthOverview(now);
+  const { next } = useLearn(now, {
+    tightBudget: budgets.find((b) => b.status !== 'ok')?.categoryName ?? null,
+    goalsCount: goals.length,
+  });
   const firstName = profile?.name.split(' ')[0];
 
   return (
-    <Screen bottomInset={TAB_BAR_HEIGHT}>
+    <Screen bottomInset={QUICK_ADD_BUTTON_CLEARANCE}>
       <View style={styles.topRow}>
         <Text variant="overline" tone="inkMuted" style={styles.flex}>
           {monthName(now)} · {daysLeftLabel(now)}
@@ -71,6 +77,7 @@ export default function InicioScreen() {
       </View>
 
       {recommendation ? <RecommendationCard rec={recommendation} /> : null}
+      {loaded && next ? <NextLessonRow next={next} /> : null}
     </Screen>
   );
 }

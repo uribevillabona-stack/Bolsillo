@@ -1,0 +1,52 @@
+{
+  "id": "gastos-hormiga",
+  "order": 1,
+  "title": "Los gastos hormiga",
+  "summary": "Lo pequeño que se repite pesa más de lo que crees.",
+  "minutes": 3,
+  "cards": [
+    {
+      "title": "¿Qué es un gasto hormiga?",
+      "body": "Es un gasto pequeño que haces casi sin pensar: el tinto, la empanada, la recarga, el domicilio de la noche. Uno solo no se nota. El problema es que se repite."
+    },
+    {
+      "title": "Hagamos la cuenta",
+      "highlight": "Más de $ 600.000 al año",
+      "body": "Un tinto de $ 2.500, cinco días a la semana, son más de $ 50.000 al mes. En un año: unos $ 650.000. Con eso pagas varios meses de transporte o buena parte de un celular."
+    },
+    {
+      "title": "No se trata de no tomar tinto",
+      "body": "La idea no es vivir a pura agua. Es que esos gastos sean una decisión y no un reflejo. Si el tinto de la mañana te alegra el día, déjalo. El de las 4 p. m. por aburrimiento, quizá no."
+    },
+    {
+      "title": "Lo que no se ve, no se controla",
+      "body": "Por eso BOLSILLO te pide anotarlos aunque sean de $ 2.000. Con una o dos semanas de datos, la vista Hormigas te muestra a dónde se va tu plata y cuánto sería en un año."
+    },
+    {
+      "title": "Tres trucos que sí funcionan",
+      "body": "1. Ponle tope a tu hormiga más grande en Plan.\n2. Lleva termo o lonchera dos días a la semana, no todos.\n3. Antes de pedir domicilio, espera 10 minutos: muchas veces se te pasa el antojo."
+    },
+    {
+      "title": "Mándalo a un Apartado",
+      "body": "Lo que dejes de gastar en hormigas no lo dejes suelto en la cuenta: se va en otra cosa. Sepáralo en un Apartado con nombre propio. Ver que crece es la mejor motivación."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Si compras una gaseosa de $ 3.000 cada día hábil (unos 20 al mes), ¿cuánto suma en un año?",
+      "options": ["Unos $ 36.000", "Unos $ 240.000", "Unos $ 720.000"],
+      "answer": 2,
+      "explanation": "$ 3.000 × 20 días = $ 60.000 al mes. Por 12 meses son $ 720.000."
+    },
+    {
+      "question": "¿Cuál es la mejor forma de bajarle a los gastos hormiga?",
+      "options": [
+        "Prohibírmelos todos de una",
+        "Anotarlos y escoger cuáles valen la pena",
+        "No mirar la cuenta para no estresarme"
+      ],
+      "answer": 1,
+      "explanation": "Prohibir todo casi nunca dura. Ver cuánto suman y escoger con intención sí funciona."
+    }
+  ]
+}

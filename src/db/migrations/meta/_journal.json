@@ -15,6 +15,13 @@
       "when": 1794024673963,
       "tag": "0001_presupuesto_y_recomendaciones",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794025669568,
+      "tag": "0002_lecciones",
+      "breakpoints": true
     }
   ]
 }
